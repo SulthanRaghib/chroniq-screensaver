@@ -18,16 +18,17 @@ def build() -> None:
     dist_dir = root_dir / "dist"
     dist_dir.mkdir(parents=True, exist_ok=True)
 
-    cs_source = root_dir / "src" / "native" / "NativeScreensaver.cs"
+    native_src_dir = root_dir / "src" / "native"
     csc_path = Path(r"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe")
     ico_path = root_dir / "assets" / "favicon.ico"
 
     print("==================================================")
-    print("  BUILDING CHRONIQ SCREENSAVER (.SCR & .EXE)")
+    print("  BUILDING MODULAR CHRONIQ SCREENSAVER (.SCR & .EXE)")
     print("==================================================")
 
-    if not cs_source.exists():
-        print(f"[ERROR] Source file not found: {cs_source}")
+    cs_files = sorted(list(native_src_dir.rglob("*.cs")))
+    if not cs_files:
+        print(f"[ERROR] No C# source files found in: {native_src_dir}")
         sys.exit(1)
 
     if not csc_path.exists():
@@ -49,9 +50,10 @@ def build() -> None:
     if ico_path.exists():
         cmd.append(f"/win32icon:{ico_path}")
 
-    cmd.append(str(cs_source))
+    for cs_file in cs_files:
+        cmd.append(str(cs_file))
 
-    print(f"Compiling native binary with icon: {' '.join(cmd)}")
+    print(f"Compiling {len(cs_files)} modular C# source files with icon...")
     result = subprocess.run(cmd)
 
     if result.returncode == 0 and exe_file.exists():
