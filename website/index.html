@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chroniq Screensaver — Aesthetic Analog & Digital Flip Clock for Windows</title>
+  <meta name="description" content="The ultimate aesthetic screensaver for Windows. Instant 0ms startup, 60 FPS mechanical sweep, Fliqlo-style flip clock, OLED anti-burn-in, and full color customization in under 150 KB." />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+  <link rel="apple-touch-icon" href="assets/chroniq_icon.png" />
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Chroniq Screensaver — Aesthetic Analog & Digital Clock" />
+  <meta property="og:description" content="Aesthetic dual-mode screensaver for Windows with 0ms startup, 60 FPS continuous sweep, and full customization." />
+  <meta property="og:image" content="assets/chroniq_banner.jpg" />
+  <meta property="og:type" content="website" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              cyan: '#00F0FF',
+              blue: '#3B82F6',
+              dark: '#07090E',
+              card: '#0E131F',
+              border: 'rgba(255, 255, 255, 0.08)'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/custom.css" />
+</head>
+
+<body class="bg-[#07090E] text-gray-100 min-h-screen selection:bg-cyan-500 selection:text-black">
+
+  <!-- Background Glows -->
+  <div class="blob-cyan top-0 left-1/4"></div>
+  <div class="blob-purple top-1/3 right-10"></div>
+
+  <!-- 1. Header & Navigation -->
+  <header class="sticky top-0 z-50 glass-panel border-b border-white/5 bg-[#07090E]/80">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-3.5 group">
+        <img src="assets/chroniq_icon.png" alt="Chroniq Icon" class="w-10 h-10 rounded-xl shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform duration-300" />
+        <div>
+          <span class="text-xl font-bold tracking-tight text-white flex items-center gap-1.5">
+            CHRONIQ
+            <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">v1.0</span>
+          </span>
+          <p class="text-[11px] text-gray-400 font-medium tracking-wide">Aesthetic Windows Screensaver</p>
+        </div>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-300">
+        <a href="#simulator" class="hover:text-cyan-400 transition-colors">Live Preview</a>
+        <a href="#features" class="hover:text-cyan-400 transition-colors">Features</a>
+        <a href="#presets" class="hover:text-cyan-400 transition-colors">Presets</a>
+        <a href="#installation" class="hover:text-cyan-400 transition-colors">How to Install</a>
+        <a href="#faq" class="hover:text-cyan-400 transition-colors">FAQ</a>
+      </nav>
+
+      <!-- CTA Buttons -->
+      <div class="hidden sm:flex items-center gap-4">
+        <a href="https://github.com" target="_blank" class="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-xl glass-pill text-gray-300 hover:text-white hover:border-white/20 transition-all">
+          <i data-lucide="github" class="w-4 h-4"></i>
+          <span>GitHub</span>
+        </a>
+        <a href="#download" class="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/25 glow-btn">
+          <i data-lucide="download" class="w-4 h-4"></i>
+          <span>Download Free</span>
+        </a>
+      </div>
+
+      <!-- Mobile Menu Button -->
+      <button id="btn-mobile-menu" class="md:hidden text-gray-400 hover:text-white p-2">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+
+    </div>
+
+    <!-- Mobile Dropdown -->
+    <div id="mobile-menu" class="hidden md:hidden px-6 py-4 border-t border-white/5 bg-[#07090E]">
+      <div class="flex flex-col gap-3 text-sm font-medium text-gray-300">
+        <a href="#simulator" class="py-1 hover:text-cyan-400">Live Preview</a>
+        <a href="#features" class="py-1 hover:text-cyan-400">Features</a>
+        <a href="#presets" class="py-1 hover:text-cyan-400">Presets</a>
+        <a href="#installation" class="py-1 hover:text-cyan-400">How to Install</a>
+        <a href="#faq" class="py-1 hover:text-cyan-400">FAQ</a>
+        <a href="#download" class="mt-2 text-center py-2.5 rounded-xl bg-blue-600 text-white font-semibold">Download for Windows</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. Hero Section -->
+  <section class="relative pt-12 pb-24 px-6 overflow-hidden">
+    <div class="max-w-5xl mx-auto text-center relative z-10">
+      
+      <!-- Top Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-pill text-xs font-semibold text-cyan-300 mb-6 border border-cyan-500/20">
+        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+        Dual-Engine: Luxury Analog & Digital Flip Clock
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+        The Ultimate Aesthetic Screensaver <br class="hidden sm:inline" />
+        <span class="bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-400 bg-clip-text text-transparent">
+          for Windows.
+        </span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-base sm:text-lg text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+        Engineered with native C# for <b>0ms instant startup</b>. Features 60 FPS continuous mechanical sweep, retro-modern Fliqlo flip cards, OLED anti-burn-in, and full color freedom in under <b>150 KB</b>.
+      </p>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-4 mb-16">
+        <a href="dist/Chroniq.scr" download="Chroniq.scr" class="flex items-center gap-3 px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-base shadow-xl shadow-blue-500/30 glow-btn">
+          <i data-lucide="download" class="w-5 h-5"></i>
+          <span>Download Screensaver (.SCR)</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-blue-700/60 text-blue-200 font-mono">148 KB</span>
+        </a>
+        <a href="dist/Chroniq.exe" download="Chroniq.exe" class="flex items-center gap-2 px-6 py-4 rounded-2xl glass-panel text-gray-300 hover:text-white hover:border-white/20 font-semibold text-base transition-all">
+          <i data-lucide="monitor" class="w-5 h-5"></i>
+          <span>Portable App (.EXE)</span>
+        </a>
+      </div>
+
+      <!-- Trust Badges -->
+      <div class="flex flex-wrap items-center justify-center gap-6 sm:gap-10 text-xs font-semibold text-gray-400 mb-16">
+        <span class="flex items-center gap-2">
+          <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i> Windows 10 & 11 Ready
+        </span>
+        <span class="flex items-center gap-2">
+          <i data-lucide="zap" class="w-4 h-4 text-yellow-400"></i> 0ms Instant Zero-Flash
+        </span>
+        <span class="flex items-center gap-2">
+          <i data-lucide="shield-check" class="w-4 h-4 text-cyan-400"></i> 100% Free & Open Source
+        </span>
+        <span class="flex items-center gap-2">
+          <i data-lucide="feather" class="w-4 h-4 text-purple-400"></i> Ultra-Lightweight (148 KB)
+        </span>
+      </div>
+
+      <!-- 3. Interactive Real-Time Clock Simulator Box -->
+      <div id="simulator" class="relative max-w-4xl mx-auto rounded-3xl p-3 sm:p-5 glass-panel glow-cyan border border-white/10 shadow-2xl">
+        
+        <!-- Controls Header Bar -->
+        <div class="flex flex-wrap items-center justify-between gap-3 p-3 mb-3 rounded-2xl bg-[#090D17]/80 border border-white/5">
+          
+          <!-- Mode Switcher -->
+          <div class="flex items-center p-1 rounded-xl bg-black/40 border border-white/5">
+            <button id="btn-mode-analog" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white shadow-lg shadow-blue-500/30 flex items-center gap-1.5">
+              <span>🕰️</span> Analog
+            </button>
+            <button id="btn-mode-digital" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all text-gray-400 hover:text-white flex items-center gap-1.5">
+              <span>🔢</span> Digital Flip
+            </button>
+          </div>
+
+          <!-- Feature Toggles -->
+          <div class="flex items-center gap-2">
+            <button id="toggle-24h" class="px-3 py-1.5 rounded-lg text-xs font-semibold glass-pill text-gray-300 hover:text-white transition-all">
+              24H Format
+            </button>
+            <button id="toggle-sweep" class="px-3 py-1.5 rounded-lg text-xs font-semibold glass-pill text-gray-300 hover:text-white transition-all">
+              ⚡ 60 FPS Sweep
+            </button>
+            <button id="btn-fullscreen" title="Fullscreen Test" class="p-2 rounded-lg glass-pill text-gray-300 hover:text-cyan-400 transition-all flex items-center gap-1 text-xs font-semibold">
+              <i data-lucide="maximize" class="w-4 h-4"></i>
+              <span class="hidden sm:inline">Fullscreen</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Clock Canvas Frame -->
+        <div id="clock-container" class="relative w-full h-[360px] sm:h-[480px] rounded-2xl overflow-hidden bg-[#0B0F19] border border-white/5 flex items-center justify-center">
+          <canvas id="clock-canvas"></canvas>
+          
+          <!-- Fullscreen Exit Notice -->
+          <div id="fs-exit-notice" class="hidden absolute top-6 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full glass-panel text-xs font-medium text-gray-300 shadow-xl pointer-events-none">
+            Press <kbd class="px-1.5 py-0.5 rounded bg-white/10 font-mono text-white">ESC</kbd> or click anywhere to exit fullscreen
+          </div>
+        </div>
+
+        <!-- Theme Chips Footer -->
+        <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between flex-wrap gap-2 text-xs">
+          <span class="text-gray-400 font-medium">Quick Themes:</span>
+          <div class="flex flex-wrap items-center gap-2">
+            <button class="preset-pill px-3 py-1 rounded-lg border border-cyan-400 text-cyan-400 bg-cyan-500/10 font-medium transition-all" data-preset="Modern Dark">Modern Dark</button>
+            <button class="preset-pill px-3 py-1 rounded-lg border border-white/10 text-gray-400 hover:text-white font-medium transition-all" data-preset="Fliqlo Monochrome">Fliqlo</button>
+            <button class="preset-pill px-3 py-1 rounded-lg border border-white/10 text-gray-400 hover:text-white font-medium transition-all" data-preset="Classic Vintage Roman">Classic Roman</button>
+            <button class="preset-pill px-3 py-1 rounded-lg border border-white/10 text-gray-400 hover:text-white font-medium transition-all" data-preset="Swiss Railway">Swiss Railway</button>
+            <button class="preset-pill px-3 py-1 rounded-lg border border-white/10 text-gray-400 hover:text-white font-medium transition-all" data-preset="Cyberpunk Neon">Cyberpunk</button>
+            <button class="preset-pill px-3 py-1 rounded-lg border border-white/10 text-gray-400 hover:text-white font-medium transition-all" data-preset="Emerald Luxury">Emerald</button>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. Key Features Bento Grid -->
+  <section id="features" class="py-24 px-6 border-t border-white/5 relative z-10 bg-[#07090E]/60">
+    <div class="max-w-6xl mx-auto">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Engineering & Aesthetics</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mt-2 mb-4 tracking-tight">Built for Desktop Perfection.</h2>
+        <p class="text-gray-400 text-sm sm:text-base">Every millisecond and pixel has been crafted for optimal performance and pure visual pleasure.</p>
+      </div>
+
+      <!-- Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Feature 1 -->
+        <div class="p-8 rounded-3xl glass-panel glow-subtle transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 text-cyan-400 flex items-center justify-center mb-6 border border-cyan-500/20">
+            <i data-lucide="zap" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">0ms Zero-Flash Startup</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Written in native C# WinForms/GDI+. No heavy Electron or Python extraction lag. Screensaver activates instantaneously in under 5 milliseconds with zero grey flashes.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="p-8 rounded-3xl glass-panel glow-subtle transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center mb-6 border border-blue-500/20">
+            <i data-lucide="layers" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Dual-Mode Architecture</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Choose between 5 luxury analog dial styles (*Modern, Classic Roman, Swiss Bauhaus, Sport, Minimal*) or iconic Fliqlo-inspired retro-modern digital flip cards.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="p-8 rounded-3xl glass-panel glow-subtle transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-6 border border-indigo-500/20">
+            <i data-lucide="activity" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">60 FPS Smooth Sweep</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Enjoy mechanical automatic watch smoothness with continuous trigonometric sweep calculations, or toggle traditional 1-second quartz ticking.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="p-8 rounded-3xl glass-panel glow-subtle transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center mb-6 border border-purple-500/20">
+            <i data-lucide="shield" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">OLED Anti-Burn-In Protection</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Sinusoidal sub-pixel orbital drift gently shifts the clock every few minutes to completely prevent permanent image retention on modern OLED and AMOLED displays.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="p-8 rounded-3xl glass-panel glow-subtle transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center mb-6 border border-emerald-500/20">
+            <i data-lucide="globe" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Multi-Language Date Format</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Auto-detects your Windows system locale or lets you choose Indonesian (*RAB 19 AGU*), English (*WED 19 AUG*), Full Date, or Numeric formats.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="p-8 rounded-3xl glass-panel glow-subtle transition-all duration-300">
+          <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-6 border border-amber-500/20">
+            <i data-lucide="palette" class="w-6 h-6"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">12-Zone Color Customization</h3>
+          <p class="text-gray-400 text-sm leading-relaxed">
+            Integrated visual color pickers inside the native settings dialog allow total aesthetic freedom over backgrounds, dials, hands, markers, and accent pins.
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 5. Preset Showcase Gallery -->
+  <section id="presets" class="py-24 px-6 relative z-10">
+    <div class="max-w-6xl mx-auto">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Aesthetic Presets</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mt-2 mb-4 tracking-tight">8 Curated Color Palettes.</h2>
+        <p class="text-gray-400 text-sm sm:text-base">Meticulously color-graded for clean setups, dark mode setups, and executive workspaces.</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+        
+        <div class="p-5 rounded-2xl glass-panel text-center hover:border-cyan-400/40 transition-all cursor-pointer group" onclick="window.chroniqClock.applyPreset('Modern Dark'); document.getElementById('simulator').scrollIntoView({behavior: 'smooth'});">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-white/20 bg-[#0B0F19] shadow-md"></div>
+          <h4 class="font-bold text-sm text-white group-hover:text-cyan-400">Modern Dark</h4>
+          <p class="text-[11px] text-gray-400">Obsidian & Blue</p>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel text-center hover:border-amber-400/40 transition-all cursor-pointer group" onclick="window.chroniqClock.applyPreset('Fliqlo Monochrome'); document.getElementById('simulator').scrollIntoView({behavior: 'smooth'});">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-amber-500/30 bg-[#121212] shadow-md"></div>
+          <h4 class="font-bold text-sm text-white group-hover:text-amber-400">Fliqlo Monochrome</h4>
+          <p class="text-[11px] text-gray-400">Flip Clock Amber</p>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel text-center hover:border-yellow-400/40 transition-all cursor-pointer group" onclick="window.chroniqClock.applyPreset('Classic Vintage Roman'); document.getElementById('simulator').scrollIntoView({behavior: 'smooth'});">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-[#C5A059] bg-[#F7F3E9] shadow-md"></div>
+          <h4 class="font-bold text-sm text-white group-hover:text-yellow-400">Classic Roman</h4>
+          <p class="text-[11px] text-gray-400">Cream & Gold</p>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel text-center hover:border-red-400/40 transition-all cursor-pointer group" onclick="window.chroniqClock.applyPreset('Swiss Railway'); document.getElementById('simulator').scrollIntoView({behavior: 'smooth'});">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-red-500/40 bg-white shadow-md"></div>
+          <h4 class="font-bold text-sm text-white group-hover:text-red-400">Swiss Railway</h4>
+          <p class="text-[11px] text-gray-400">Bauhaus Red Disc</p>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel text-center hover:border-blue-400/40 transition-all cursor-pointer group" onclick="window.chroniqClock.applyPreset('Midnight Sapphire'); document.getElementById('simulator').scrollIntoView({behavior: 'smooth'});">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-blue-600 bg-[#0B1528] shadow-md"></div>
+          <h4 class="font-bold text-sm text-white group-hover:text-blue-400">Midnight Sapphire</h4>
+          <p class="text-[11px] text-gray-400">Deep Ocean Glow</p>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel text-center hover:border-cyan-400/40 transition-all cursor-pointer group" onclick="window.chroniqClock.applyPreset('Cyberpunk Neon'); document.getElementById('simulator').scrollIntoView({behavior: 'smooth'});">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-cyan-400 bg-[#0D0D14] shadow-md"></div>
+          <h4 class="font-bold text-sm text-white group-hover:text-cyan-400">Cyberpunk Neon</h4>
+          <p class="text-[11px] text-gray-400">Neon Sci-Fi</p>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel text-center hover:border-slate-400/40 transition-all cursor-pointer group" onclick="window.chroniqClock.applyPreset('Minimal Slate'); document.getElementById('simulator').scrollIntoView({behavior: 'smooth'});">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-slate-500 bg-[#1E293B] shadow-md"></div>
+          <h4 class="font-bold text-sm text-white group-hover:text-slate-300">Minimal Slate</h4>
+          <p class="text-[11px] text-gray-400">Pure Monolith</p>
+        </div>
+
+        <div class="p-5 rounded-2xl glass-panel text-center hover:border-emerald-400/40 transition-all cursor-pointer group" onclick="window.chroniqClock.applyPreset('Emerald Luxury'); document.getElementById('simulator').scrollIntoView({behavior: 'smooth'});">
+          <div class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-emerald-500 bg-[#062317] shadow-md"></div>
+          <h4 class="font-bold text-sm text-white group-hover:text-emerald-400">Emerald Luxury</h4>
+          <p class="text-[11px] text-gray-400">Forest & Royal Gold</p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 6. 3-Step Simple Installation Guide -->
+  <section id="installation" class="py-24 px-6 border-t border-white/5 relative z-10 bg-[#07090E]/60">
+    <div class="max-w-4xl mx-auto">
+      
+      <div class="text-center max-w-2xl mx-auto mb-16">
+        <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Easy Setup</span>
+        <h2 class="text-3xl sm:text-5xl font-extrabold text-white mt-2 mb-4 tracking-tight">Installed in 10 Seconds.</h2>
+        <p class="text-gray-400 text-sm sm:text-base">No setup wizards or bloatware. Just a single clean Windows screensaver binary.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <div class="p-6 rounded-2xl glass-panel relative">
+          <div class="text-3xl font-extrabold text-cyan-400/30 mb-2 font-mono">01</div>
+          <h4 class="text-base font-bold text-white mb-2">Download File</h4>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Download the official <code class="px-1 py-0.5 rounded bg-white/10 font-mono text-cyan-300">Chroniq.scr</code> binary (148 KB) directly to your computer.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl glass-panel relative">
+          <div class="text-3xl font-extrabold text-blue-400/30 mb-2 font-mono">02</div>
+          <h4 class="text-base font-bold text-white mb-2">Right-Click & Install</h4>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Right-click <code class="px-1 py-0.5 rounded bg-white/10 font-mono text-blue-300">Chroniq.scr</code> and select <b>"Install"</b>. Windows Screen Saver Settings opens automatically.
+          </p>
+        </div>
+
+        <div class="p-6 rounded-2xl glass-panel relative">
+          <div class="text-3xl font-extrabold text-emerald-400/30 mb-2 font-mono">03</div>
+          <h4 class="text-base font-bold text-white mb-2">Customize & Enjoy</h4>
+          <p class="text-xs text-gray-400 leading-relaxed">
+            Click <b>"Settings..."</b> to pick your favorite theme, analog/digital mode, colors, and date format. Done!
+          </p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 7. FAQ Accordion -->
+  <section id="faq" class="py-24 px-6 relative z-10">
+    <div class="max-w-3xl mx-auto">
+      
+      <div class="text-center mb-16">
+        <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Questions & Answers</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2 tracking-tight">Frequently Asked Questions</h2>
+      </div>
+
+      <div class="space-y-4">
+        
+        <div class="faq-item rounded-2xl glass-panel p-5 cursor-pointer">
+          <div class="faq-header flex items-center justify-between">
+            <h4 class="font-bold text-sm text-white">Is Chroniq Screensaver completely free?</h4>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-xs text-gray-400 pt-3 leading-relaxed">
+              Yes, Chroniq is 100% free, open-source, and contains zero ads, telemetry, or bloatware. You can view the entire source code on GitHub.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item rounded-2xl glass-panel p-5 cursor-pointer">
+          <div class="faq-header flex items-center justify-between">
+            <h4 class="font-bold text-sm text-white">What are the system requirements?</h4>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-xs text-gray-400 pt-3 leading-relaxed">
+              Chroniq runs on all versions of Windows 10 and Windows 11 (64-bit and 32-bit). It requires .NET Framework 4.5 or newer, which is already built-in to Windows by default.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item rounded-2xl glass-panel p-5 cursor-pointer">
+          <div class="faq-header flex items-center justify-between">
+            <h4 class="font-bold text-sm text-white">How do I uninstall Chroniq?</h4>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-xs text-gray-400 pt-3 leading-relaxed">
+              Simply delete <code class="text-cyan-300">Chroniq.scr</code> from your <code class="text-cyan-300">C:\Windows\System32\</code> folder or wherever you saved it. There are no registry leftovers or background services.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item rounded-2xl glass-panel p-5 cursor-pointer">
+          <div class="faq-header flex items-center justify-between">
+            <h4 class="font-bold text-sm text-white">Does it support multiple monitors?</h4>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-xs text-gray-400 pt-3 leading-relaxed">
+              Yes! Chroniq detects all active displays connected to your system and runs the screensaver synchronously across all monitors.
+            </p>
+          </div>
+        </div>
+
+        <div class="faq-item rounded-2xl glass-panel p-5 cursor-pointer">
+          <div class="faq-header flex items-center justify-between">
+            <h4 class="font-bold text-sm text-white">How does the OLED anti-burn-in feature work?</h4>
+            <i data-lucide="chevron-down" class="faq-icon w-5 h-5 text-gray-400 transition-transform duration-300"></i>
+          </div>
+          <div class="faq-answer">
+            <p class="text-xs text-gray-400 pt-3 leading-relaxed">
+              It calculates a periodic sub-pixel sinusoidal orbital offset. Every few minutes, the clock smoothly shifts position by 10–18 pixels, ensuring static pixel illumination is avoided.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 8. Final CTA Download Banner -->
+  <section id="download" class="py-20 px-6 border-t border-white/5 relative z-10 bg-gradient-to-b from-[#090D17] to-[#07090E]">
+    <div class="max-w-4xl mx-auto text-center">
+      <img src="assets/chroniq_icon.png" alt="Chroniq Logo" class="w-16 h-16 rounded-2xl mx-auto mb-6 shadow-2xl shadow-cyan-500/30" />
+      <h2 class="text-3xl sm:text-5xl font-extrabold text-white tracking-tight mb-4">Elevate Your Windows Desktop.</h2>
+      <p class="text-gray-400 text-sm sm:text-base max-w-xl mx-auto mb-8">
+        Free, open source, and lightweight. Download Chroniq screensaver now and transform your inactive monitor into a timepiece artwork.
+      </p>
+
+      <div class="flex flex-wrap items-center justify-center gap-4">
+        <a href="dist/Chroniq.scr" download="Chroniq.scr" class="flex items-center gap-3 px-8 py-4 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-base shadow-xl shadow-blue-500/30 glow-btn">
+          <i data-lucide="download" class="w-5 h-5"></i>
+          <span>Download Chroniq.scr (Free)</span>
+          <span class="text-xs px-2 py-0.5 rounded bg-blue-700/60 text-blue-200 font-mono">148 KB</span>
+        </a>
+      </div>
+      <p class="text-xs text-gray-500 mt-4">Compatible with Windows 10 & Windows 11 (64-bit / 32-bit)</p>
+    </div>
+  </section>
+
+  <!-- 9. Footer -->
+  <footer class="py-12 px-6 border-t border-white/5 text-xs text-gray-400 bg-[#05070A]">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <img src="assets/chroniq_icon.png" alt="Chroniq" class="w-6 h-6 rounded-lg" />
+        <span class="font-bold text-white tracking-tight">CHRONIQ SCREENSAVER</span>
+        <span>•</span>
+        <span>Crafted with precision for desktop aesthetics</span>
+      </div>
+
+      <div class="flex items-center gap-6 text-gray-400">
+        <a href="#simulator" class="hover:text-white transition-colors">Simulator</a>
+        <a href="#features" class="hover:text-white transition-colors">Features</a>
+        <a href="#installation" class="hover:text-white transition-colors">Install</a>
+        <a href="https://github.com" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
+          <i data-lucide="github" class="w-4 h-4"></i> GitHub
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Init Lucide Icons -->
+  <script>
+    lucide.createIcons();
+  </script>
+
+  <!-- Main JavaScript -->
+  <script src="js/clock_simulator.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
