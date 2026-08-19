@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using Chroniq.Models;
+using Chroniq.Native;
 using Chroniq.Rendering;
 
 namespace Chroniq.UI
@@ -96,8 +97,8 @@ namespace Chroniq.UI
             btnPreview.ForeColor = Color.White;
             btnPreview.FlatStyle = FlatStyle.Flat;
             btnPreview.FlatAppearance.BorderSize = 0;
-            btnPreview.Size = new Size(135, 38);
-            btnPreview.Location = new Point(16, 11);
+            btnPreview.Size = new Size(120, 38);
+            btnPreview.Location = new Point(14, 11);
             btnPreview.Cursor = Cursors.Hand;
             btnPreview.Click += (s, e) => {
                 ClockConfig previewConfig = BuildCurrentUIConfig();
@@ -108,6 +109,21 @@ namespace Chroniq.UI
                 Cursor.Show();
             };
 
+            Button btnInstall = new Button();
+            btnInstall.Text = "💾 Pasang ke Windows";
+            btnInstall.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
+            btnInstall.BackColor = Color.FromArgb(139, 92, 246);
+            btnInstall.ForeColor = Color.White;
+            btnInstall.FlatStyle = FlatStyle.Flat;
+            btnInstall.FlatAppearance.BorderSize = 0;
+            btnInstall.Size = new Size(155, 38);
+            btnInstall.Location = new Point(142, 11);
+            btnInstall.Cursor = Cursors.Hand;
+            btnInstall.Click += (s, e) => {
+                SaveAndClose(suppressMsg: true);
+                InstallerHelper.InstallToWindows(showSuccessMessage: true);
+            };
+
             Button btnSave = new Button();
             btnSave.Text = "Simpan & Terapkan";
             btnSave.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
@@ -115,8 +131,8 @@ namespace Chroniq.UI
             btnSave.ForeColor = Color.White;
             btnSave.FlatStyle = FlatStyle.Flat;
             btnSave.FlatAppearance.BorderSize = 0;
-            btnSave.Size = new Size(155, 38);
-            btnSave.Location = new Point(465, 11);
+            btnSave.Size = new Size(150, 38);
+            btnSave.Location = new Point(475, 11);
             btnSave.Cursor = Cursors.Hand;
             btnSave.Click += (s, e) => SaveAndClose();
 
@@ -126,12 +142,13 @@ namespace Chroniq.UI
             btnCancel.ForeColor = Color.White;
             btnCancel.FlatStyle = FlatStyle.Flat;
             btnCancel.FlatAppearance.BorderSize = 0;
-            btnCancel.Size = new Size(85, 38);
-            btnCancel.Location = new Point(370, 11);
+            btnCancel.Size = new Size(75, 38);
+            btnCancel.Location = new Point(390, 11);
             btnCancel.Cursor = Cursors.Hand;
             btnCancel.Click += (s, e) => this.Close();
 
             bottomPanel.Controls.Add(btnPreview);
+            bottomPanel.Controls.Add(btnInstall);
             bottomPanel.Controls.Add(btnSave);
             bottomPanel.Controls.Add(btnCancel);
 
@@ -480,11 +497,14 @@ namespace Chroniq.UI
             this.config = BuildCurrentUIConfig();
         }
 
-        private void SaveAndClose()
+        private void SaveAndClose(bool suppressMsg = false)
         {
             SyncUIToConfig();
             config.Save();
-            MessageBox.Show("Pengaturan jam screensaver berhasil disimpan!", "Berhasil", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            if (!suppressMsg)
+            {
+                MessageBox.Show("Pengaturan jam screensaver berhasil disimpan!", "Berhasil", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             this.Close();
         }
     }

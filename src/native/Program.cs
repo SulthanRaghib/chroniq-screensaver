@@ -30,7 +30,13 @@ namespace Chroniq
                 string firstArg = args[0].ToLower().Trim();
                 string secondArg = args.Length > 1 ? args[1] : null;
 
-                if (firstArg.StartsWith("/c"))
+                if (firstArg.Contains("install") || firstArg.Contains("setup"))
+                {
+                    // Direct installation command
+                    InstallerHelper.InstallToWindows();
+                    return;
+                }
+                else if (firstArg.StartsWith("/c") || firstArg.Contains("settings") || firstArg.Contains("config"))
                 {
                     // Open Native Settings Dialog
                     Application.Run(new SettingsForm());
