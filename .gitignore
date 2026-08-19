@@ -5,9 +5,11 @@ __pycache__/
 
 # Distribution / packaging
 build/
-dist/
-*.egg-info/
-.eggs/
+/dist/
+!docs/dist/
+!docs/dist/*
+!website/dist/
+!website/dist/*
 
 # PyInstaller
 *.manifest
