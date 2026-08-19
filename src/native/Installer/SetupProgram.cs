@@ -38,15 +38,16 @@ namespace Chroniq.Installer
         {
             try
             {
-                // 1. Close open screensaver & settings dialogs
-                foreach (var proc in Process.GetProcessesByName("Chroniq"))
-                {
-                    try { proc.Kill(); } catch { }
-                }
-                foreach (var proc in Process.GetProcessesByName("rundll32"))
-                {
-                    try { proc.Kill(); } catch { }
-                }
+                // 1. Force kill all running screensaver instances and preview processes
+                ProcessStartInfo psiKill = new ProcessStartInfo();
+                psiKill.FileName = "cmd.exe";
+                psiKill.Arguments = "/c taskkill /f /im Chroniq.scr 2>nul & taskkill /f /im Chroniq.exe 2>nul & taskkill /f /im rundll32.exe 2>nul & del /f /q \"%SystemRoot%\\System32\\PChroniq.scr\" 2>nul & del /f /q \"%SystemRoot%\\SysWOW64\\PChroniq.scr\" 2>nul";
+                psiKill.UseShellExecute = false;
+                psiKill.CreateNoWindow = true;
+                psiKill.WindowStyle = ProcessWindowStyle.Hidden;
+
+                Process pKill = Process.Start(psiKill);
+                if (pKill != null) pKill.WaitForExit(3000);
 
                 // 2. Extract embedded Chroniq.scr or copy companion
                 byte[] scrBytes = null;
@@ -62,12 +63,6 @@ namespace Chroniq.Installer
 
                 string sysDir = Environment.GetFolderPath(Environment.SpecialFolder.System);
                 string targetScr = Path.Combine(sysDir, "Chroniq.scr");
-
-                // Clean legacy aliases first from System32
-                string legacyPChroniq = Path.Combine(sysDir, "PChroniq.scr");
-                if (File.Exists(legacyPChroniq)) try { File.Delete(legacyPChroniq); } catch { }
-                string legacyAnalog = Path.Combine(sysDir, "AnalogClock.scr");
-                if (File.Exists(legacyAnalog)) try { File.Delete(legacyAnalog); } catch { }
 
                 if (scrBytes != null && scrBytes.Length > 0)
                 {
@@ -90,11 +85,6 @@ namespace Chroniq.Installer
                     if (Directory.Exists(sysWow64))
                     {
                         string wow64Target = Path.Combine(sysWow64, "Chroniq.scr");
-                        string wow64PChroniq = Path.Combine(sysWow64, "PChroniq.scr");
-                        if (File.Exists(wow64PChroniq)) try { File.Delete(wow64PChroniq); } catch { }
-                        string wow64Analog = Path.Combine(sysWow64, "AnalogClock.scr");
-                        if (File.Exists(wow64Analog)) try { File.Delete(wow64Analog); } catch { }
-
                         if (scrBytes != null && scrBytes.Length > 0)
                         {
                             try { File.WriteAllBytes(wow64Target, scrBytes); } catch { }
@@ -106,22 +96,22 @@ namespace Chroniq.Installer
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "SCRNSAVE.EXE", targetScr);
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "ScreenSaveActive", "1");
 
-                // 4. Open Windows Screen Saver Settings with WorkingDirectory set to System32 (Prevents PChroniq alias)
+                // 4. Open Screen Saver Settings dialog from System32 working directory
                 try
                 {
-                    ProcessStartInfo psi = new ProcessStartInfo();
-                    psi.FileName = Path.Combine(sysDir, "rundll32.exe");
-                    psi.Arguments = "desk.cpl,InstallScreenSaver \"" + targetScr + "\"";
-                    psi.WorkingDirectory = sysDir;
-                    Process.Start(psi);
+                    ProcessStartInfo psiOpen = new ProcessStartInfo();
+                    psiOpen.FileName = "cmd.exe";
+                    psiOpen.Arguments = string.Format("/c start \"\" /d \"%SystemRoot%\\System32\" rundll32.exe desk.cpl,InstallScreenSaver \"{0}\"", targetScr);
+                    psiOpen.UseShellExecute = false;
+                    psiOpen.CreateNoWindow = true;
+                    Process.Start(psiOpen);
                 }
                 catch { }
 
                 if (!silent)
                 {
                     MessageBox.Show(
-                        "Chroniq Screensaver telah berhasil dipasang ke sistem Windows!\n\n" +
-                        "Nama 'Chroniq' kini aktif dan muncul permanen di menu screensaver Windows.",
+                        "Chroniq Screensaver telah berhasil dipasang ke sistem Windows!\n\nNama 'Chroniq' kini aktif dan muncul permanen di menu screensaver Windows.",
                         "Instalasi Berhasil",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information
@@ -143,58 +133,36 @@ namespace Chroniq.Installer
         {
             try
             {
-                // 1. Close open screensaver & settings dialogs
-                foreach (var proc in Process.GetProcessesByName("Chroniq"))
-                {
-                    try { proc.Kill(); } catch { }
-                }
-                foreach (var proc in Process.GetProcessesByName("rundll32"))
-                {
-                    try { proc.Kill(); } catch { }
-                }
+                // 1. Force kill all running screensaver instances, preview windows, and stale dialogs
+                ProcessStartInfo psiKill = new ProcessStartInfo();
+                psiKill.FileName = "cmd.exe";
+                psiKill.Arguments = "/c taskkill /f /im Chroniq.scr 2>nul & taskkill /f /im Chroniq.exe 2>nul & taskkill /f /im rundll32.exe 2>nul & del /f /q \"%SystemRoot%\\System32\\Chroniq.scr\" 2>nul & del /f /q \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" 2>nul & del /f /q \"%SystemRoot%\\System32\\PChroniq.scr\" 2>nul & del /f /q \"%SystemRoot%\\SysWOW64\\PChroniq.scr\" 2>nul & del /f /q \"%SystemRoot%\\System32\\AnalogClock.scr\" 2>nul & del /f /q \"%SystemRoot%\\SysWOW64\\AnalogClock.scr\" 2>nul & reg add \"HKCU\\Control Panel\\Desktop\" /v SCRNSAVE.EXE /t REG_SZ /d \"\" /f >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v ScreenSaveActive /t REG_SZ /d 0 /f >nul";
+                psiKill.UseShellExecute = false;
+                psiKill.CreateNoWindow = true;
+                psiKill.WindowStyle = ProcessWindowStyle.Hidden;
 
-                string sysDir = Environment.GetFolderPath(Environment.SpecialFolder.System);
-                string targetScr = Path.Combine(sysDir, "Chroniq.scr");
-                if (File.Exists(targetScr)) try { File.Delete(targetScr); } catch { }
-                string targetP = Path.Combine(sysDir, "PChroniq.scr");
-                if (File.Exists(targetP)) try { File.Delete(targetP); } catch { }
-                string targetA = Path.Combine(sysDir, "AnalogClock.scr");
-                if (File.Exists(targetA)) try { File.Delete(targetA); } catch { }
-
-                string sysRoot = Environment.GetEnvironmentVariable("SystemRoot");
-                if (!string.IsNullOrEmpty(sysRoot))
+                Process p = Process.Start(psiKill);
+                if (p != null)
                 {
-                    string sysWow64 = Path.Combine(sysRoot, "SysWOW64");
-                    if (Directory.Exists(sysWow64))
-                    {
-                        string wowScr = Path.Combine(sysWow64, "Chroniq.scr");
-                        if (File.Exists(wowScr)) try { File.Delete(wowScr); } catch { }
-                        string wowP = Path.Combine(sysWow64, "PChroniq.scr");
-                        if (File.Exists(wowP)) try { File.Delete(wowP); } catch { }
-                        string wowA = Path.Combine(sysWow64, "AnalogClock.scr");
-                        if (File.Exists(wowA)) try { File.Delete(wowA); } catch { }
-                    }
+                    p.WaitForExit(4000);
                 }
 
-                // Reset Registry
-                Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "SCRNSAVE.EXE", "");
-                Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "ScreenSaveActive", "0");
-
-                // Open fresh desk.cpl with WorkingDirectory set to System32
+                // 2. Open fresh Screen Saver Settings dialog from System32
                 try
                 {
-                    ProcessStartInfo psi = new ProcessStartInfo();
-                    psi.FileName = Path.Combine(sysDir, "rundll32.exe");
-                    psi.Arguments = "desk.cpl";
-                    psi.WorkingDirectory = sysDir;
-                    Process.Start(psi);
+                    ProcessStartInfo psiOpen = new ProcessStartInfo();
+                    psiOpen.FileName = "cmd.exe";
+                    psiOpen.Arguments = "/c start \"\" /d \"%SystemRoot%\\System32\" rundll32.exe desk.cpl,InstallScreenSaver";
+                    psiOpen.UseShellExecute = false;
+                    psiOpen.CreateNoWindow = true;
+                    Process.Start(psiOpen);
                 }
                 catch { }
 
                 if (!silent)
                 {
                     MessageBox.Show(
-                        "Chroniq Screensaver telah berhasil di-uninstall dan dihapus bersih dari sistem Windows.",
+                        "Chroniq Screensaver telah berhasil di-uninstall dan dihapus bersih dari sistem Windows.\n\nPilihan screensaver kini kembali ke (None).",
                         "Uninstall Berhasil",
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information
