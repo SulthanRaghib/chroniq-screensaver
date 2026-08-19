@@ -38,8 +38,12 @@ namespace Chroniq.Installer
         {
             try
             {
-                // 1. Terminate existing screensavers
+                // 1. Close open screensaver & settings dialogs
                 foreach (var proc in Process.GetProcessesByName("Chroniq"))
+                {
+                    try { proc.Kill(); } catch { }
+                }
+                foreach (var proc in Process.GetProcessesByName("rundll32"))
                 {
                     try { proc.Kill(); } catch { }
                 }
@@ -59,7 +63,7 @@ namespace Chroniq.Installer
                 string sysDir = Environment.GetFolderPath(Environment.SpecialFolder.System);
                 string targetScr = Path.Combine(sysDir, "Chroniq.scr");
 
-                // Clean legacy aliases first
+                // Clean legacy aliases first from System32
                 string legacyPChroniq = Path.Combine(sysDir, "PChroniq.scr");
                 if (File.Exists(legacyPChroniq)) try { File.Delete(legacyPChroniq); } catch { }
                 string legacyAnalog = Path.Combine(sysDir, "AnalogClock.scr");
@@ -71,7 +75,6 @@ namespace Chroniq.Installer
                 }
                 else
                 {
-                    // Fallback to companion file in same directory
                     string localScr = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Chroniq.scr");
                     if (File.Exists(localScr))
                     {
@@ -103,10 +106,14 @@ namespace Chroniq.Installer
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "SCRNSAVE.EXE", targetScr);
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "ScreenSaveActive", "1");
 
-                // 4. Open Windows Screen Saver Settings dialog
+                // 4. Open Windows Screen Saver Settings with WorkingDirectory set to System32 (Prevents PChroniq alias)
                 try
                 {
-                    Process.Start("rundll32.exe", "desk.cpl,InstallScreenSaver \"" + targetScr + "\"");
+                    ProcessStartInfo psi = new ProcessStartInfo();
+                    psi.FileName = Path.Combine(sysDir, "rundll32.exe");
+                    psi.Arguments = "desk.cpl,InstallScreenSaver \"" + targetScr + "\"";
+                    psi.WorkingDirectory = sysDir;
+                    Process.Start(psi);
                 }
                 catch { }
 
@@ -136,7 +143,12 @@ namespace Chroniq.Installer
         {
             try
             {
+                // 1. Close open screensaver & settings dialogs
                 foreach (var proc in Process.GetProcessesByName("Chroniq"))
+                {
+                    try { proc.Kill(); } catch { }
+                }
+                foreach (var proc in Process.GetProcessesByName("rundll32"))
                 {
                     try { proc.Kill(); } catch { }
                 }
@@ -164,8 +176,20 @@ namespace Chroniq.Installer
                     }
                 }
 
+                // Reset Registry
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "SCRNSAVE.EXE", "");
                 Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "ScreenSaveActive", "0");
+
+                // Open fresh desk.cpl with WorkingDirectory set to System32
+                try
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo();
+                    psi.FileName = Path.Combine(sysDir, "rundll32.exe");
+                    psi.Arguments = "desk.cpl";
+                    psi.WorkingDirectory = sysDir;
+                    Process.Start(psi);
+                }
+                catch { }
 
                 if (!silent)
                 {

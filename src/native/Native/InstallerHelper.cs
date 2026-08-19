@@ -41,7 +41,7 @@ namespace Chroniq.Native
                     ProcessStartInfo psi = new ProcessStartInfo();
                     psi.FileName = "cmd.exe";
                     psi.Arguments = string.Format(
-                        "/c taskkill /f /im Chroniq.scr 2>nul & taskkill /f /im Chroniq.exe 2>nul & del /f /q \"%SystemRoot%\\System32\\PChroniq.scr\" 2>nul & del /f /q \"%SystemRoot%\\SysWOW64\\PChroniq.scr\" 2>nul & copy /y \"{0}\" \"%SystemRoot%\\System32\\Chroniq.scr\" >nul & if exist \"%SystemRoot%\\SysWOW64\" copy /y \"{0}\" \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v SCRNSAVE.EXE /t REG_SZ /d \"%SystemRoot%\\System32\\Chroniq.scr\" /f >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v ScreenSaveActive /t REG_SZ /d 1 /f >nul & start rundll32.exe desk.cpl,InstallScreenSaver \"%SystemRoot%\\System32\\Chroniq.scr\"",
+                        "/c taskkill /f /im Chroniq.scr 2>nul & taskkill /f /im Chroniq.exe 2>nul & taskkill /f /im rundll32.exe 2>nul & del /f /q \"%SystemRoot%\\System32\\PChroniq.scr\" 2>nul & del /f /q \"%SystemRoot%\\SysWOW64\\PChroniq.scr\" 2>nul & copy /y \"{0}\" \"%SystemRoot%\\System32\\Chroniq.scr\" >nul & if exist \"%SystemRoot%\\SysWOW64\" copy /y \"{0}\" \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v SCRNSAVE.EXE /t REG_SZ /d \"%SystemRoot%\\System32\\Chroniq.scr\" /f >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v ScreenSaveActive /t REG_SZ /d 1 /f >nul & start \"\" /d \"%SystemRoot%\\System32\" rundll32.exe desk.cpl,InstallScreenSaver \"%SystemRoot%\\System32\\Chroniq.scr\"",
                         currentExe
                     );
                     psi.Verb = "runas";
@@ -85,6 +85,10 @@ namespace Chroniq.Native
                             try { proc.Kill(); } catch { }
                         }
                     }
+                    foreach (var proc in Process.GetProcessesByName("rundll32"))
+                    {
+                        try { proc.Kill(); } catch { }
+                    }
                 }
                 catch { }
 
@@ -109,7 +113,11 @@ namespace Chroniq.Native
 
                 try
                 {
-                    Process.Start("rundll32.exe", "desk.cpl,InstallScreenSaver \"" + targetScr + "\"");
+                    ProcessStartInfo psi = new ProcessStartInfo();
+                    psi.FileName = Path.Combine(systemDir, "rundll32.exe");
+                    psi.Arguments = "desk.cpl,InstallScreenSaver \"" + targetScr + "\"";
+                    psi.WorkingDirectory = systemDir;
+                    Process.Start(psi);
                 }
                 catch { }
 
@@ -140,7 +148,7 @@ namespace Chroniq.Native
                 {
                     ProcessStartInfo psi = new ProcessStartInfo();
                     psi.FileName = "cmd.exe";
-                    psi.Arguments = "/c taskkill /f /im Chroniq.scr 2>nul & taskkill /f /im Chroniq.exe 2>nul & if exist \"%SystemRoot%\\System32\\Chroniq.scr\" del /f /q \"%SystemRoot%\\System32\\Chroniq.scr\" >nul & if exist \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" del /f /q \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v SCRNSAVE.EXE /t REG_SZ /d \"\" /f >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v ScreenSaveActive /t REG_SZ /d 0 /f >nul";
+                    psi.Arguments = "/c taskkill /f /im Chroniq.scr 2>nul & taskkill /f /im Chroniq.exe 2>nul & taskkill /f /im rundll32.exe 2>nul & if exist \"%SystemRoot%\\System32\\Chroniq.scr\" del /f /q \"%SystemRoot%\\System32\\Chroniq.scr\" >nul & if exist \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" del /f /q \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v SCRNSAVE.EXE /t REG_SZ /d \"\" /f >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v ScreenSaveActive /t REG_SZ /d 0 /f >nul & start \"\" /d \"%SystemRoot%\\System32\" rundll32.exe desk.cpl";
                     psi.Verb = "runas";
                     psi.UseShellExecute = true;
                     psi.WindowStyle = ProcessWindowStyle.Hidden;
