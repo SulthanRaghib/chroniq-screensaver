@@ -65,34 +65,89 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. Fullscreen Simulator Overlay Mode
+  // 5. Fullscreen Simulator Mode (HTML5 Native + CSS Fallback)
   const btnFullscreen = document.getElementById('btn-fullscreen');
   const clockContainer = document.getElementById('clock-container');
   const fsNotice = document.getElementById('fs-exit-notice');
 
   if (btnFullscreen && clockContainer) {
-    const enterFullscreen = () => {
-      clockContainer.classList.add('fullscreen-clock');
-      if (fsNotice) fsNotice.classList.remove('hidden');
-      window.dispatchEvent(new Event('resize'));
+    const isFullscreen = () => {
+      return !!(document.fullscreenElement || document.webkitFullscreenElement || clockContainer.classList.contains('fullscreen-clock'));
     };
 
-    const exitFullscreen = () => {
+    const enterFullscreen = async () => {
+      try {
+        if (clockContainer.requestFullscreen) {
+          await clockContainer.requestFullscreen();
+        } else if (clockContainer.webkitRequestFullscreen) {
+          await clockContainer.webkitRequestFullscreen();
+        } else {
+          clockContainer.classList.add('fullscreen-clock');
+        }
+      } catch (err) {
+        clockContainer.classList.add('fullscreen-clock');
+      }
+
+      if (fsNotice) fsNotice.classList.remove('hidden');
+      setTimeout(() => {
+        if (clock && clock.resize) clock.resize();
+        window.dispatchEvent(new Event('resize'));
+      }, 60);
+    };
+
+    const exitFullscreen = async () => {
+      try {
+        if (document.fullscreenElement || document.webkitFullscreenElement) {
+          if (document.exitFullscreen) {
+            await document.exitFullscreen();
+          } else if (document.webkitExitFullscreen) {
+            await document.webkitExitFullscreen();
+          }
+        }
+      } catch (err) { }
+
       clockContainer.classList.remove('fullscreen-clock');
       if (fsNotice) fsNotice.classList.add('hidden');
-      window.dispatchEvent(new Event('resize'));
+      setTimeout(() => {
+        if (clock && clock.resize) clock.resize();
+        window.dispatchEvent(new Event('resize'));
+      }, 60);
     };
 
-    btnFullscreen.addEventListener('click', enterFullscreen);
+    btnFullscreen.addEventListener('click', () => {
+      if (isFullscreen()) {
+        exitFullscreen();
+      } else {
+        enterFullscreen();
+      }
+    });
+
+    const handleFsChange = () => {
+      const active = !!(document.fullscreenElement || document.webkitFullscreenElement);
+      if (fsNotice) {
+        if (active) fsNotice.classList.remove('hidden');
+        else fsNotice.classList.add('hidden');
+      }
+      if (!active) {
+        clockContainer.classList.remove('fullscreen-clock');
+      }
+      setTimeout(() => {
+        if (clock && clock.resize) clock.resize();
+        window.dispatchEvent(new Event('resize'));
+      }, 60);
+    };
+
+    document.addEventListener('fullscreenchange', handleFsChange);
+    document.addEventListener('webkitfullscreenchange', handleFsChange);
 
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && clockContainer.classList.contains('fullscreen-clock')) {
+      if (e.key === 'Escape' && isFullscreen()) {
         exitFullscreen();
       }
     });
 
     clockContainer.addEventListener('click', () => {
-      if (clockContainer.classList.contains('fullscreen-clock')) {
+      if (isFullscreen()) {
         exitFullscreen();
       }
     });

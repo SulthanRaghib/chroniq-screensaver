@@ -98,18 +98,20 @@ class ClockSimulator {
   }
 
   setupResize() {
-    const resize = () => {
+    this.resize = () => {
+      if (!this.canvas || !this.canvas.parentElement) return;
       const rect = this.canvas.parentElement.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
-      this.canvas.width = rect.width * dpr;
-      this.canvas.height = rect.height * dpr;
+      this.canvas.width = Math.round(rect.width * dpr);
+      this.canvas.height = Math.round(rect.height * dpr);
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.ctx.scale(dpr, dpr);
       this.logicalWidth = rect.width;
       this.logicalHeight = rect.height;
     };
 
-    window.addEventListener('resize', resize);
-    resize();
+    window.addEventListener('resize', this.resize);
+    this.resize();
   }
 
   start() {

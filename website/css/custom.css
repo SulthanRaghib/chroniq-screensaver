@@ -108,16 +108,37 @@ body {
   display: block;
 }
 
-/* Fullscreen Overlay Mode */
-.fullscreen-clock {
-  position: fixed !important;
-  inset: 0 !important;
+/* Native & Fallback Fullscreen Simulator */
+#clock-container:fullscreen,
+#clock-container:-webkit-full-screen {
   width: 100vw !important;
   height: 100vh !important;
-  z-index: 99999 !important;
   background: #07090E !important;
   border-radius: 0 !important;
   border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer;
+}
+
+#clock-container.fullscreen-clock {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 999999 !important;
+  background: #07090E !important;
+  border-radius: 0 !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  cursor: pointer;
 }
 
 /* Accordion Smooth Transitions */
