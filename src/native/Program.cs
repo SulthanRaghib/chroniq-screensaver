@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Windows.Forms;
 using Chroniq.Native;
 using Chroniq.UI;
@@ -6,7 +7,8 @@ using Chroniq.UI;
 namespace Chroniq
 {
     /// <summary>
-    /// Application entry point routing Windows screensaver command-line flags (/s, /c, /p).
+    /// Application entry point routing Windows screensaver command-line flags (/s, /c, /p)
+    /// and smart self-installation prompt when executed outside System32.
     /// </summary>
     public static class Program
     {
@@ -73,43 +75,72 @@ namespace Chroniq
                 }
                 else if (firstArg.StartsWith("/s"))
                 {
-                    // Fullscreen on all screens
+                    // Fullscreen request. If user double-clicked .SCR from outside System32, offer to install:
+                    if (!IsRunningFromSystem32())
+                    {
+                        DialogResult res = MessageBox.Show(
+                            "Apakah Anda ingin memasang Chroniq Screensaver ke sistem Windows sekarang?\n\n" +
+                            "• Klik [Yes] untuk memasang ke Windows (Muncul permanen di dropdown)\n" +
+                            "• Klik [No] untuk langsung mencoba layar penuh (Preview)",
+                            "Chroniq Screensaver Setup",
+                            MessageBoxButtons.YesNoCancel,
+                            MessageBoxIcon.Question
+                        );
+
+                        if (res == DialogResult.Yes)
+                        {
+                            InstallerHelper.InstallToWindows();
+                            return;
+                        }
+                        else if (res == DialogResult.Cancel)
+                        {
+                            return;
+                        }
+                    }
+
                     RunFullScreen();
                     return;
                 }
             }
 
-            // Default execution without flags (e.g. user double-clicked from Downloads or custom folder)
-            try
+            // Default execution without flags (e.g. user double-clicked .exe from Downloads or custom folder)
+            if (!IsRunningFromSystem32())
             {
-                string currentDir = System.IO.Path.GetDirectoryName(Application.ExecutablePath).ToLower();
-                string sysDir = Environment.GetFolderPath(Environment.SpecialFolder.System).ToLower();
+                DialogResult res = MessageBox.Show(
+                    "Apakah Anda ingin memasang Chroniq Screensaver ke sistem Windows sekarang?\n\n" +
+                    "• Klik [Yes] untuk memasang ke Windows (Muncul permanen di dropdown)\n" +
+                    "• Klik [No] untuk langsung mencoba layar penuh (Preview)",
+                    "Chroniq Screensaver Setup",
+                    MessageBoxButtons.YesNoCancel,
+                    MessageBoxIcon.Question
+                );
 
-                if (!currentDir.StartsWith(sysDir) && !currentDir.Contains("system32") && !currentDir.Contains("syswow64"))
+                if (res == DialogResult.Yes)
                 {
-                    DialogResult res = MessageBox.Show(
-                        "Apakah Anda ingin memasang Chroniq Screensaver ke sistem Windows sekarang?\n\n" +
-                        "• Klik [Yes] untuk memasang ke Windows (Muncul di dropdown screensaver)\n" +
-                        "• Klik [No] untuk langsung mencoba layar penuh (Preview)",
-                        "Chroniq Screensaver Setup",
-                        MessageBoxButtons.YesNoCancel,
-                        MessageBoxIcon.Question
-                    );
-
-                    if (res == DialogResult.Yes)
-                    {
-                        InstallerHelper.InstallToWindows();
-                        return;
-                    }
-                    else if (res == DialogResult.Cancel)
-                    {
-                        return;
-                    }
+                    InstallerHelper.InstallToWindows();
+                    return;
+                }
+                else if (res == DialogResult.Cancel)
+                {
+                    return;
                 }
             }
-            catch { }
 
             RunFullScreen();
+        }
+
+        public static bool IsRunningFromSystem32()
+        {
+            try
+            {
+                string currentDir = Path.GetDirectoryName(Application.ExecutablePath).ToLower();
+                string sysDir = Environment.GetFolderPath(Environment.SpecialFolder.System).ToLower();
+                return currentDir.StartsWith(sysDir) || currentDir.Contains("system32") || currentDir.Contains("syswow64");
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         private static void RunFullScreen()
