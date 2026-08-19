@@ -1,6 +1,10 @@
 """
 Automated Build Pipeline for Chroniq Screensaver.
-Compiles the C# Native Windows Screensaver with embedded icon into dist/Chroniq.scr and dist/Chroniq.exe.
+Compiles:
+1. dist/Chroniq.scr (Official Screensaver)
+2. dist/Chroniq.exe (Portable Runner)
+3. dist/Chroniq_Setup.exe (Standalone 1-Click GUI Installer with requireAdministrator manifest)
+4. dist/Chroniq_Windows.zip (Complete distribution package)
 """
 
 from __future__ import annotations
@@ -21,24 +25,22 @@ def build() -> None:
     native_src_dir = root_dir / "src" / "native"
     csc_path = Path(r"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe")
     ico_path = root_dir / "assets" / "favicon.ico"
+    manifest_path = native_src_dir / "Installer" / "app.manifest"
 
     print("==================================================")
-    print("  BUILDING MODULAR CHRONIQ SCREENSAVER (.SCR & .EXE)")
+    print("  BUILDING MODULAR CHRONIQ SCREENSAVER & SETUP")
     print("==================================================")
-
-    cs_files = sorted(list(native_src_dir.rglob("*.cs")))
-    if not cs_files:
-        print(f"[ERROR] No C# source files found in: {native_src_dir}")
-        sys.exit(1)
 
     if not csc_path.exists():
         print(f"[ERROR] Native compiler not found: {csc_path}")
         sys.exit(1)
 
+    # 1. Compile Chroniq.exe & Chroniq.scr (Excluding SetupProgram.cs)
+    main_cs_files = [f for f in sorted(list(native_src_dir.rglob("*.cs"))) if "Installer" not in f.parts]
     exe_file = dist_dir / "Chroniq.exe"
     scr_file = dist_dir / "Chroniq.scr"
 
-    cmd = [
+    cmd_main = [
         str(csc_path),
         "/target:winexe",
         f"/out:{exe_file}",
@@ -46,34 +48,59 @@ def build() -> None:
         "/r:System.Drawing.dll",
         "/optimize+",
     ]
-
     if ico_path.exists():
-        cmd.append(f"/win32icon:{ico_path}")
+        cmd_main.append(f"/win32icon:{ico_path}")
+    for cs_file in main_cs_files:
+        cmd_main.append(str(cs_file))
 
-    for cs_file in cs_files:
-        cmd.append(str(cs_file))
+    print(f"1. Compiling {len(main_cs_files)} main C# source files...")
+    res_main = subprocess.run(cmd_main)
+    if res_main.returncode != 0 or not exe_file.exists():
+        print("[ERROR] Failed to compile main executable!")
+        sys.exit(1)
 
-    print(f"Compiling {len(cs_files)} modular C# source files with icon...")
-    result = subprocess.run(cmd)
+    shutil.copyfile(exe_file, scr_file)
 
-    if result.returncode == 0 and exe_file.exists():
-        try:
-            subprocess.run(["taskkill", "/f", "/im", "Chroniq.scr"], capture_output=True)
-            subprocess.run(["taskkill", "/f", "/im", "Chroniq.exe"], capture_output=True)
-            subprocess.run(["taskkill", "/f", "/im", "AnalogClock.scr"], capture_output=True)
-            subprocess.run(["taskkill", "/f", "/im", "AnalogClock.exe"], capture_output=True)
-        except Exception:
-            pass
+    # 2. Compile Standalone 1-Click GUI Installer (Chroniq_Setup.exe)
+    setup_file = dist_dir / "Chroniq_Setup.exe"
+    setup_cs_files = [
+        native_src_dir / "Installer" / "SetupProgram.cs",
+        native_src_dir / "AssemblyInfo.cs",
+    ]
 
-        shutil.copyfile(exe_file, scr_file)
+    cmd_setup = [
+        str(csc_path),
+        "/target:winexe",
+        f"/out:{setup_file}",
+        f"/resource:{scr_file},Chroniq.scr",
+        "/r:System.Windows.Forms.dll",
+        "/r:System.Drawing.dll",
+        "/optimize+",
+    ]
+    if ico_path.exists():
+        cmd_setup.append(f"/win32icon:{ico_path}")
+    if manifest_path.exists():
+        cmd_setup.append(f"/win32manifest:{manifest_path}")
+    for cs_file in setup_cs_files:
+        cmd_setup.append(str(cs_file))
 
-        # Create distribution zip package with scripts and README
-        zip_temp = root_dir / "scratch" / "zip_temp"
-        zip_temp.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(scr_file, zip_temp / "Chroniq.scr")
-        shutil.copyfile(exe_file, zip_temp / "Chroniq.exe")
+    print("2. Compiling 1-Click Standalone GUI Installer (Chroniq_Setup.exe)...")
+    res_setup = subprocess.run(cmd_setup)
+    if res_setup.returncode != 0 or not setup_file.exists():
+        print("[WARNING] Setup compilation failed, continuing with scr/exe...")
 
-        install_bat_content = """@echo off
+    # 3. Create distribution zip package
+    zip_temp = root_dir / "scratch" / "zip_temp"
+    if zip_temp.exists():
+        shutil.rmtree(zip_temp)
+    zip_temp.mkdir(parents=True, exist_ok=True)
+
+    if setup_file.exists():
+        shutil.copyfile(setup_file, zip_temp / "Chroniq_Setup.exe")
+    shutil.copyfile(scr_file, zip_temp / "Chroniq.scr")
+    shutil.copyfile(exe_file, zip_temp / "Chroniq.exe")
+
+    install_bat_content = """@echo off
 setlocal EnableDelayedExpansion
 
 fltmc >nul 2>&1 || (
@@ -92,6 +119,12 @@ cd /d "%SCRIPT_DIR%"
 
 taskkill /f /im Chroniq.scr 2>nul
 taskkill /f /im Chroniq.exe 2>nul
+
+:: Hapus alias lama
+if exist "%SystemRoot%\\System32\\PChroniq.scr" del /f /q "%SystemRoot%\\System32\\PChroniq.scr" >nul 2>nul
+if exist "%SystemRoot%\\SysWOW64\\PChroniq.scr" del /f /q "%SystemRoot%\\SysWOW64\\PChroniq.scr" >nul 2>nul
+if exist "%SystemRoot%\\System32\\AnalogClock.scr" del /f /q "%SystemRoot%\\System32\\AnalogClock.scr" >nul 2>nul
+if exist "%SystemRoot%\\SysWOW64\\AnalogClock.scr" del /f /q "%SystemRoot%\\SysWOW64\\AnalogClock.scr" >nul 2>nul
 
 set "SRC_FILE=%SCRIPT_DIR%Chroniq.scr"
 if not exist "!SRC_FILE!" (
@@ -125,10 +158,10 @@ echo Nama 'Chroniq' kini muncul permanen di menu dropdown Windows.
 echo.
 pause
 """
-        with open(zip_temp / "Install_Chroniq.bat", "w", encoding="utf-8") as f:
-            f.write(install_bat_content)
+    with open(zip_temp / "Install_Chroniq.bat", "w", encoding="utf-8") as f:
+        f.write(install_bat_content)
 
-        uninstall_bat_content = """@echo off
+    uninstall_bat_content = """@echo off
 setlocal EnableDelayedExpansion
 
 fltmc >nul 2>&1 || (
@@ -155,6 +188,8 @@ if exist "%SystemRoot%\\SysWOW64\\Chroniq.scr" (
     del /f /q "%SystemRoot%\\SysWOW64\\Chroniq.scr" >nul
     echo Menghapus Chroniq dari C:\\Windows\\SysWOW64...
 )
+if exist "%SystemRoot%\\System32\\PChroniq.scr" del /f /q "%SystemRoot%\\System32\\PChroniq.scr" >nul 2>nul
+if exist "%SystemRoot%\\SysWOW64\\PChroniq.scr" del /f /q "%SystemRoot%\\SysWOW64\\PChroniq.scr" >nul 2>nul
 if exist "%SystemRoot%\\System32\\AnalogClock.scr" del /f /q "%SystemRoot%\\System32\\AnalogClock.scr" 2>nul
 if exist "%SystemRoot%\\SysWOW64\\AnalogClock.scr" del /f /q "%SystemRoot%\\SysWOW64\\AnalogClock.scr" 2>nul
 
@@ -170,46 +205,65 @@ echo Pilihan screensaver telah di-reset ke default.
 echo.
 pause
 """
-        with open(zip_temp / "Uninstall_Chroniq.bat", "w", encoding="utf-8") as f:
-            f.write(uninstall_bat_content)
+    with open(zip_temp / "Uninstall_Chroniq.bat", "w", encoding="utf-8") as f:
+        f.write(uninstall_bat_content)
 
-        readme_src = root_dir / "website" / "dist" / "README.md"
-        if readme_src.exists():
-            shutil.copyfile(readme_src, zip_temp / "README.md")
+    readme_content = """# Chroniq Screensaver - Panduan Instalasi & Kustomisasi
 
-        # Zip package
-        import zipfile
-        for zip_target in [dist_dir / "Chroniq_Windows.zip", root_dir / "website" / "dist" / "Chroniq_Windows.zip", root_dir / "docs" / "dist" / "Chroniq_Windows.zip"]:
-            zip_target.parent.mkdir(parents=True, exist_ok=True)
-            with zipfile.ZipFile(zip_target, "w", zipfile.ZIP_DEFLATED) as zipf:
-                for file_path in zip_temp.glob("*"):
-                    zipf.write(file_path, file_path.name)
+Chroniq adalah screensaver jam estetis performa tinggi untuk Windows 10 & 11 dengan Dual-Engine: **Analog Modern** & **Digital Flip Clock (Fliqlo Style)**.
 
-        # Mirror SCR & EXE to website and docs
-        for folder in [root_dir / "website" / "dist", root_dir / "docs" / "dist"]:
-            folder.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(scr_file, folder / "Chroniq.scr")
-            shutil.copyfile(exe_file, folder / "Chroniq.exe")
-            if readme_src.exists() and readme_src.resolve() != (folder / "README.md").resolve():
-                shutil.copyfile(readme_src, folder / "README.md")
+---
 
-        shutil.rmtree(zip_temp, ignore_errors=True)
+## 🚀 Cara Instalasi Cepat (Pilih Salah Satu):
 
-        print("--------------------------------------------------")
-        print("[SUCCESS] Chroniq Screensaver Successfully Built!")
-        print(f"File Size: {exe_file.stat().st_size / 1024:.1f} KB")
-        print(f"Official Screensaver File (.scr): {scr_file}")
-        print(f"Standalone Executable: {exe_file}")
-        print(f"Distribution Zip Archive: {dist_dir / 'Chroniq_Windows.zip'}")
-        print("--------------------------------------------------")
-        print("Tips:")
-        print("1. File siap pakai ada di folder 'dist/'")
-        print("2. Klik dua kali 'dist/Chroniq_Windows.zip' untuk melihat paket installer, uninstaller & README")
-        print("3. Atau klik kanan file 'dist/Chroniq.scr' lalu pilih 'Install'")
-        print("--------------------------------------------------")
-    else:
-        print("[ERROR] Native compilation failed!")
-        sys.exit(result.returncode)
+### Opsi 1 (Paling Mudah - 1-Click Installer GUI):
+1. Klik dua kali file **`Chroniq_Setup.exe`**.
+2. Klik tombol biru **"Pasang Screensaver (1-Click Install)"**.
+3. Selesai! Chroniq langsung terpasang ke `C:\\Windows\\System32` dan jendela screensaver Windows akan otomatis terbuka.
+
+### Opsi 2 (Skrip Otomatis):
+1. Klik dua kali file **`Install_Chroniq.bat`**.
+2. Klik **Yes** pada konfirmasi izin Administrator.
+
+---
+
+## 🗑️ Cara Uninstall:
+1. Klik dua kali file **`Uninstall_Chroniq.bat`** atau buka **`Chroniq_Setup.exe`** lalu klik tombol merah **"Copot (Uninstall)"**.
+2. Screensaver akan dihapus bersih dari sistem Windows.
+
+---
+
+## ⚙️ Kustomisasi:
+Buka pengaturan Windows Screensaver (*Screen Saver Settings*) -> Pilih **Chroniq** -> Klik **Settings...**.
+"""
+    with open(zip_temp / "README.md", "w", encoding="utf-8") as f:
+        f.write(readme_content)
+
+    # Make zip archive
+    zip_dest = dist_dir / "Chroniq_Windows"
+    shutil.make_archive(str(zip_dest), "zip", zip_temp)
+
+    # Sync to website & docs dist folders
+    web_dist = root_dir / "website" / "dist"
+    web_dist.mkdir(parents=True, exist_ok=True)
+    docs_dist = root_dir / "docs" / "dist"
+    docs_dist.mkdir(parents=True, exist_ok=True)
+
+    for target in [web_dist, docs_dist]:
+        if setup_file.exists():
+            shutil.copyfile(setup_file, target / "Chroniq_Setup.exe")
+        shutil.copyfile(scr_file, target / "Chroniq.scr")
+        shutil.copyfile(exe_file, target / "Chroniq.exe")
+        shutil.copyfile(dist_dir / "Chroniq_Windows.zip", target / "Chroniq_Windows.zip")
+        shutil.copyfile(zip_temp / "README.md", target / "README.md")
+
+    print("--------------------------------------------------")
+    print("[SUCCESS] All Chroniq Packages Successfully Built!")
+    print(f"1-Click Standalone Installer: {setup_file}")
+    print(f"Official Screensaver File:   {scr_file}")
+    print(f"Standalone Executable:       {exe_file}")
+    print(f"Full Distribution Zip:       {dist_dir / 'Chroniq_Windows.zip'}")
+    print("--------------------------------------------------")
 
 
 if __name__ == "__main__":
