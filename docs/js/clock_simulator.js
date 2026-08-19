@@ -157,11 +157,11 @@ class ClockSimulator {
     const cy = h / 2;
 
     const baseSize = Math.min(w, h) * this.config.scale;
-    const cardH = baseSize * 0.48;
-    const cardW = cardH * 0.90;
-    const secCardW = cardW * 0.65;
-    const secCardH = cardH * 0.65;
-    const gap = baseSize * 0.035;
+    const cardH = baseSize * 0.44;
+    const cardW = cardH * 1.15;
+    const secCardW = cardW * 0.58;
+    const secCardH = cardH * 0.58;
+    const gap = baseSize * 0.055;
 
     const use24 = this.config.use24Hour;
     const showSec = this.config.showSeconds;
@@ -175,7 +175,7 @@ class ClockSimulator {
 
     const totalW = showSec ? (cardW * 2 + secCardW + gap * 2) : (cardW * 2 + gap);
     const startX = cx - totalW / 2;
-    const startY = cy - cardH / 2 - (this.config.showDate ? baseSize * 0.05 : 0);
+    const startY = cy - cardH / 2 - (this.config.showDate ? baseSize * 0.04 : 0);
 
     // 1. Hour Card
     this.drawDigitalCard(startX, startY, cardW, cardH, hrStr, this.config.colors.numerals, use24 ? null : ampmStr);
@@ -191,10 +191,10 @@ class ClockSimulator {
     // 4. Date Badge
     if (this.config.showDate) {
       const dateStr = this.getFormattedDate(now);
-      const dateFontSize = Math.max(11, baseSize * 0.052);
+      const dateFontSize = Math.max(10, baseSize * 0.048);
       ctx.font = `bold ${dateFontSize}px 'Plus Jakarta Sans', sans-serif`;
       const textMetrics = ctx.measureText(dateStr);
-      const bw = textMetrics.width + baseSize * 0.08;
+      const bw = textMetrics.width + baseSize * 0.09;
       const bh = dateFontSize * 1.8;
       const bx = cx - bw / 2;
       const by = startY + cardH + baseSize * 0.06;
@@ -217,7 +217,7 @@ class ClockSimulator {
 
   drawDigitalCard(x, y, w, h, text, textColor, badgeText) {
     const ctx = this.ctx;
-    const cornerR = Math.max(6, h * 0.08);
+    const cornerR = Math.max(6, h * 0.09);
 
     // Card background
     ctx.fillStyle = this.config.colors.dial;
@@ -226,14 +226,14 @@ class ClockSimulator {
     // Border
     if (this.config.showBorder) {
       ctx.strokeStyle = this.config.colors.border;
-      ctx.lineWidth = Math.max(1, h * 0.012);
+      ctx.lineWidth = Math.max(1.2, h * 0.014);
       this.roundRect(x, y, w, h, cornerR, false, true);
     }
 
     // Flip center crease / split line
     const midY = y + h / 2;
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.4)';
-    ctx.lineWidth = Math.max(1.5, h * 0.015);
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+    ctx.lineWidth = Math.max(1.5, h * 0.018);
     ctx.beginPath();
     ctx.moveTo(x, midY);
     ctx.lineTo(x + w, midY);
@@ -242,19 +242,19 @@ class ClockSimulator {
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(x, midY + 1.5);
-    ctx.lineTo(x + w, midY + 1.5);
+    ctx.moveTo(x, midY + 1.2);
+    ctx.lineTo(x + w, midY + 1.2);
     ctx.stroke();
 
     // Side notch hinges
     const notchW = w * 0.035;
-    const notchH = h * 0.045;
+    const notchH = h * 0.050;
     ctx.fillStyle = this.config.colors.bg;
     ctx.fillRect(x - 1, midY - notchH / 2, notchW, notchH);
     ctx.fillRect(x + w - notchW + 1, midY - notchH / 2, notchW, notchH);
 
-    // Digits
-    const fontSize = Math.max(18, h * 0.62);
+    // Digits with comfortable internal padding
+    const fontSize = Math.max(16, h * 0.54);
     ctx.font = `bold ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
     ctx.fillStyle = textColor;
     ctx.textAlign = 'center';
