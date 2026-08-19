@@ -29,6 +29,8 @@ if exist "%SystemRoot%\SysWOW64\Chroniq.scr" (
     del /f /q "%SystemRoot%\SysWOW64\Chroniq.scr" >nul
     echo Menghapus Chroniq dari C:\Windows\SysWOW64...
 )
+if exist "%SystemRoot%\System32\PChroniq.scr" del /f /q "%SystemRoot%\System32\PChroniq.scr" >nul
+if exist "%SystemRoot%\SysWOW64\PChroniq.scr" del /f /q "%SystemRoot%\SysWOW64\PChroniq.scr" >nul
 if exist "%SystemRoot%\System32\AnalogClock.scr" del /f /q "%SystemRoot%\System32\AnalogClock.scr" 2>nul
 if exist "%SystemRoot%\SysWOW64\AnalogClock.scr" del /f /q "%SystemRoot%\SysWOW64\AnalogClock.scr" 2>nul
 
