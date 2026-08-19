@@ -102,15 +102,27 @@ class ClockSimulator {
       if (!this.canvas || !this.canvas.parentElement) return;
       const rect = this.canvas.parentElement.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
-      this.canvas.width = Math.round(rect.width * dpr);
-      this.canvas.height = Math.round(rect.height * dpr);
+
+      const displayWidth = Math.floor(rect.width);
+      const displayHeight = Math.floor(rect.height);
+      if (displayWidth <= 0 || displayHeight <= 0) return;
+
+      this.canvas.width = Math.round(displayWidth * dpr);
+      this.canvas.height = Math.round(displayHeight * dpr);
+      this.canvas.style.width = displayWidth + 'px';
+      this.canvas.style.height = displayHeight + 'px';
+
       this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.ctx.scale(dpr, dpr);
-      this.logicalWidth = rect.width;
-      this.logicalHeight = rect.height;
+      this.logicalWidth = displayWidth;
+      this.logicalHeight = displayHeight;
     };
 
     window.addEventListener('resize', this.resize);
+    if (window.ResizeObserver && this.canvas.parentElement) {
+      const ro = new ResizeObserver(() => this.resize());
+      ro.observe(this.canvas.parentElement);
+    }
     this.resize();
   }
 
