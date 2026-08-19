@@ -968,7 +968,7 @@ namespace AnalogClockScreensaver
 
         private void RenderDigitalClock(Graphics g, int w, int h, int driftX, int driftY, DateTime now)
         {
-            float scale = previewMode ? 0.64f : config.ClockScale;
+            float scale = previewMode ? 0.72f : config.ClockScale;
             float cx = (w / 2f) + driftX;
             float cy = (h / 2f) + driftY;
 
@@ -1437,9 +1437,21 @@ namespace AnalogClockScreensaver
         [DllImport("user32.dll")]
         static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
+        [DllImport("user32.dll")]
+        static extern bool SetProcessDPIAware();
+
         [STAThread]
         static void Main(string[] args)
         {
+            try
+            {
+                if (Environment.OSVersion.Version.Major >= 6)
+                {
+                    SetProcessDPIAware();
+                }
+            }
+            catch { }
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
@@ -1457,11 +1469,18 @@ namespace AnalogClockScreensaver
                 else if (firstArg.StartsWith("/p"))
                 {
                     // Preview mode in screensaver settings mini-display
-                    if (secondArg != null)
+                    string hwndStr = secondArg;
+                    if (string.IsNullOrEmpty(hwndStr) && firstArg.Contains(":"))
+                    {
+                        string[] parts = firstArg.Split(':');
+                        if (parts.Length > 1) hwndStr = parts[1];
+                    }
+
+                    if (!string.IsNullOrEmpty(hwndStr))
                     {
                         try
                         {
-                            IntPtr previewHandle = new IntPtr(long.Parse(secondArg));
+                            IntPtr previewHandle = new IntPtr(long.Parse(hwndStr));
                             ScreenSaverForm form = new ScreenSaverForm(previewHandle);
                             ShowWindow(form.Handle, 5); // SW_SHOW
                             Application.Run(form);
