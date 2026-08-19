@@ -79,7 +79,36 @@ namespace Chroniq
                 }
             }
 
-            // Default: Fullscreen
+            // Default execution without flags (e.g. user double-clicked from Downloads or custom folder)
+            try
+            {
+                string currentDir = System.IO.Path.GetDirectoryName(Application.ExecutablePath).ToLower();
+                string sysDir = Environment.GetFolderPath(Environment.SpecialFolder.System).ToLower();
+
+                if (!currentDir.StartsWith(sysDir) && !currentDir.Contains("system32") && !currentDir.Contains("syswow64"))
+                {
+                    DialogResult res = MessageBox.Show(
+                        "Apakah Anda ingin memasang Chroniq Screensaver ke sistem Windows sekarang?\n\n" +
+                        "• Klik [Yes] untuk memasang ke Windows (Muncul di dropdown screensaver)\n" +
+                        "• Klik [No] untuk langsung mencoba layar penuh (Preview)",
+                        "Chroniq Screensaver Setup",
+                        MessageBoxButtons.YesNoCancel,
+                        MessageBoxIcon.Question
+                    );
+
+                    if (res == DialogResult.Yes)
+                    {
+                        InstallerHelper.InstallToWindows();
+                        return;
+                    }
+                    else if (res == DialogResult.Cancel)
+                    {
+                        return;
+                    }
+                }
+            }
+            catch { }
+
             RunFullScreen();
         }
 
