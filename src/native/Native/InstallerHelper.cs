@@ -7,7 +7,7 @@ using System.Windows.Forms;
 namespace Chroniq.Native
 {
     /// <summary>
-    /// Helper to install Chroniq Screensaver directly into C:\Windows\System32 with seamless UAC elevation.
+    /// Helper to install and uninstall Chroniq Screensaver directly into C:\Windows\System32 with seamless UAC elevation.
     /// </summary>
     public static class InstallerHelper
     {
@@ -37,16 +37,35 @@ namespace Chroniq.Native
 
                 if (!IsAdministrator())
                 {
-                    // Relaunch self with UAC elevation
+                    // Elevate via cmd.exe which is 100% guaranteed to support the "runas" verb on all Windows systems
                     ProcessStartInfo psi = new ProcessStartInfo();
-                    psi.FileName = currentExe;
-                    psi.Arguments = "/install";
+                    psi.FileName = "cmd.exe";
+                    psi.Arguments = string.Format(
+                        "/c taskkill /f /im Chroniq.scr 2>nul & taskkill /f /im Chroniq.exe 2>nul & copy /y \"{0}\" \"%SystemRoot%\\System32\\Chroniq.scr\" >nul & if exist \"%SystemRoot%\\SysWOW64\" copy /y \"{0}\" \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v SCRNSAVE.EXE /t REG_SZ /d \"%SystemRoot%\\System32\\Chroniq.scr\" /f >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v ScreenSaveActive /t REG_SZ /d 1 /f >nul & start rundll32.exe desk.cpl,InstallScreenSaver \"%SystemRoot%\\System32\\Chroniq.scr\"",
+                        currentExe
+                    );
                     psi.Verb = "runas";
                     psi.UseShellExecute = true;
+                    psi.WindowStyle = ProcessWindowStyle.Hidden;
 
                     try
                     {
-                        Process.Start(psi);
+                        Process p = Process.Start(psi);
+                        if (p != null)
+                        {
+                            p.WaitForExit(5000);
+                        }
+
+                        if (showSuccessMessage)
+                        {
+                            MessageBox.Show(
+                                "Chroniq Screensaver berhasil dipasang ke sistem Windows!\n\n" +
+                                "Nama 'Chroniq' sekarang muncul permanen di menu dropdown Screen Saver Windows.",
+                                "Chroniq Installer",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information
+                            );
+                        }
                         return true;
                     }
                     catch (Exception)
@@ -56,8 +75,7 @@ namespace Chroniq.Native
                     }
                 }
 
-                // Running as Administrator:
-                // 1. Terminate running screensavers
+                // Running directly as Administrator:
                 try
                 {
                     foreach (var proc in Process.GetProcessesByName("Chroniq"))
@@ -70,10 +88,8 @@ namespace Chroniq.Native
                 }
                 catch { }
 
-                // 2. Copy to System32
                 File.Copy(currentExe, targetScr, true);
 
-                // 3. Copy to SysWOW64 if present on 64-bit Windows
                 string sysRoot = Environment.GetEnvironmentVariable("SystemRoot");
                 if (!string.IsNullOrEmpty(sysRoot))
                 {
@@ -84,7 +100,6 @@ namespace Chroniq.Native
                     }
                 }
 
-                // 4. Register in Registry
                 try
                 {
                     Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "SCRNSAVE.EXE", targetScr);
@@ -92,7 +107,6 @@ namespace Chroniq.Native
                 }
                 catch { }
 
-                // 5. Open Windows Screen Saver Settings
                 try
                 {
                     Process.Start("rundll32.exe", "desk.cpl,InstallScreenSaver \"" + targetScr + "\"");
@@ -122,19 +136,32 @@ namespace Chroniq.Native
         {
             try
             {
-                string currentExe = Application.ExecutablePath;
-
                 if (!IsAdministrator())
                 {
                     ProcessStartInfo psi = new ProcessStartInfo();
-                    psi.FileName = currentExe;
-                    psi.Arguments = "/uninstall";
+                    psi.FileName = "cmd.exe";
+                    psi.Arguments = "/c taskkill /f /im Chroniq.scr 2>nul & taskkill /f /im Chroniq.exe 2>nul & if exist \"%SystemRoot%\\System32\\Chroniq.scr\" del /f /q \"%SystemRoot%\\System32\\Chroniq.scr\" >nul & if exist \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" del /f /q \"%SystemRoot%\\SysWOW64\\Chroniq.scr\" >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v SCRNSAVE.EXE /t REG_SZ /d \"\" /f >nul & reg add \"HKCU\\Control Panel\\Desktop\" /v ScreenSaveActive /t REG_SZ /d 0 /f >nul";
                     psi.Verb = "runas";
                     psi.UseShellExecute = true;
+                    psi.WindowStyle = ProcessWindowStyle.Hidden;
 
                     try
                     {
-                        Process.Start(psi);
+                        Process p = Process.Start(psi);
+                        if (p != null)
+                        {
+                            p.WaitForExit(5000);
+                        }
+
+                        if (showSuccessMessage)
+                        {
+                            MessageBox.Show(
+                                "Chroniq Screensaver telah berhasil di-uninstall dan dihapus dari sistem Windows.",
+                                "Chroniq Uninstaller",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information
+                            );
+                        }
                         return true;
                     }
                     catch
@@ -143,7 +170,7 @@ namespace Chroniq.Native
                     }
                 }
 
-                // 1. Terminate running instances
+                // Running directly as Administrator:
                 try
                 {
                     foreach (var proc in Process.GetProcessesByName("Chroniq"))
@@ -156,7 +183,6 @@ namespace Chroniq.Native
                 }
                 catch { }
 
-                // 2. Delete files from system folders
                 string systemDir = Environment.GetFolderPath(Environment.SpecialFolder.System);
                 string targetScr = Path.Combine(systemDir, "Chroniq.scr");
                 if (File.Exists(targetScr))
@@ -175,7 +201,6 @@ namespace Chroniq.Native
                     }
                 }
 
-                // 3. Reset Registry
                 try
                 {
                     Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "SCRNSAVE.EXE", "");
