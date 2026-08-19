@@ -744,6 +744,9 @@ namespace AnalogClockScreensaver
         [DllImport("user32.dll")]
         static extern bool GetClientRect(IntPtr hWnd, out Rectangle lpRect);
 
+        [DllImport("user32.dll")]
+        static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
         private Point mouseLocation;
         private bool previewMode = false;
         private bool isTestPreview = false;
@@ -799,17 +802,18 @@ namespace AnalogClockScreensaver
             this.BackColor = ParseColor(config.BgColor, Color.FromArgb(11, 15, 25));
             this.FormBorderStyle = FormBorderStyle.None;
             this.ShowInTaskbar = false;
-
-            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer, true);
-            this.UpdateStyles();
+            this.StartPosition = FormStartPosition.Manual;
 
             SetParent(this.Handle, previewHandle);
-            SetWindowLong(this.Handle, -16, new IntPtr(GetWindowLong(this.Handle, -16) | 0x40000000)); // WS_CHILD
+            SetWindowLong(this.Handle, -16, new IntPtr(GetWindowLong(this.Handle, -16) | 0x40000000 | 0x10000000)); // WS_CHILD | WS_VISIBLE
 
             Rectangle parentRect;
             GetClientRect(previewHandle, out parentRect);
-            this.Size = parentRect.Size;
-            this.Location = new Point(0, 0);
+            this.Bounds = new Rectangle(0, 0, parentRect.Width, parentRect.Height);
+            SetWindowPos(this.Handle, IntPtr.Zero, 0, 0, parentRect.Width, parentRect.Height, 0x0040); // SWP_SHOWWINDOW
+
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
+            this.UpdateStyles();
 
             SetupTimer();
         }
@@ -898,10 +902,17 @@ namespace AnalogClockScreensaver
                 Rectangle parentRect;
                 if (GetClientRect(previewParentHwnd, out parentRect) && parentRect.Width > 0 && parentRect.Height > 0)
                 {
+                    if (this.Width != parentRect.Width || this.Height != parentRect.Height)
+                    {
+                        this.Bounds = new Rectangle(0, 0, parentRect.Width, parentRect.Height);
+                        SetWindowPos(this.Handle, IntPtr.Zero, 0, 0, parentRect.Width, parentRect.Height, 0x0040);
+                    }
                     w = parentRect.Width;
                     h = parentRect.Height;
                 }
             }
+
+            if (w <= 0 || h <= 0) return;
 
             int driftX = 0, driftY = 0;
             if (config.AntiBurnIn && !previewMode)
@@ -923,7 +934,7 @@ namespace AnalogClockScreensaver
 
         private void RenderDigitalClock(Graphics g, int w, int h, int driftX, int driftY, DateTime now)
         {
-            float scale = previewMode ? 0.85f : config.ClockScale;
+            float scale = previewMode ? 0.64f : config.ClockScale;
             float cx = (w / 2f) + driftX;
             float cy = (h / 2f) + driftY;
 
@@ -973,7 +984,7 @@ namespace AnalogClockScreensaver
             if (config.ShowDate)
             {
                 string dateStr = GetFormattedDate(now);
-                float dateFontSize = Math.Max(7f, baseSize * 0.052f);
+                float dateFontSize = Math.Max(4.5f, baseSize * (previewMode ? 0.046f : 0.052f));
 
                 using (Font dateFont = new Font("Segoe UI", dateFontSize, FontStyle.Bold))
                 using (Brush dateTextBrush = new SolidBrush(ParseColor(config.DateTextColor, Color.Gray)))
@@ -982,12 +993,12 @@ namespace AnalogClockScreensaver
                 using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 {
                     SizeF sz = g.MeasureString(dateStr, dateFont);
-                    float bw = sz.Width + baseSize * 0.08f;
-                    float bh = sz.Height + baseSize * 0.03f;
+                    float bw = sz.Width + baseSize * (previewMode ? 0.05f : 0.08f);
+                    float bh = sz.Height + baseSize * 0.02f;
                     float bx = cx - bw / 2f;
-                    float by = startY + cardH + baseSize * 0.06f;
+                    float by = startY + cardH + baseSize * (previewMode ? 0.035f : 0.06f);
 
-                    GraphicsPath path = RoundedRect(new RectangleF(bx, by, bw, bh), Math.Max(3f, baseSize * 0.015f));
+                    GraphicsPath path = RoundedRect(new RectangleF(bx, by, bw, bh), Math.Max(2f, baseSize * 0.015f));
                     g.FillPath(dateBgBrush, path);
                     g.DrawPath(dateBorderPen, path);
                     g.DrawString(dateStr, dateFont, dateTextBrush, cx, by + bh / 2f, sf);
@@ -1056,9 +1067,10 @@ namespace AnalogClockScreensaver
 
         private void RenderAnalogClock(Graphics g, int w, int h, int driftX, int driftY, DateTime now)
         {
+            float scale = previewMode ? 0.72f : config.ClockScale;
             float cx = (w / 2f) + driftX;
             float cy = (h / 2f) + driftY;
-            float radius = (Math.Min(w, h) / 2f) * (previewMode ? 0.85f : config.ClockScale);
+            float radius = (Math.Min(w, h) / 2f) * scale;
             if (radius < 10) return;
 
             // 1. Dial Face
@@ -1167,7 +1179,7 @@ namespace AnalogClockScreensaver
             if (config.ShowDate)
             {
                 string dateStr = GetFormattedDate(now);
-                float dateFontSize = Math.Max(5.5f, radius * 0.058f);
+                float dateFontSize = Math.Max(4.5f, radius * (previewMode ? 0.052f : 0.058f));
 
                 using (Font dateFont = new Font("Segoe UI", dateFontSize, FontStyle.Bold))
                 using (Brush dateTextBrush = new SolidBrush(ParseColor(config.DateTextColor, Color.Gray)))
@@ -1176,15 +1188,15 @@ namespace AnalogClockScreensaver
                 using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 {
                     SizeF sz = g.MeasureString(dateStr, dateFont);
-                    float bw = sz.Width + radius * 0.08f;
-                    float bh = sz.Height + radius * 0.03f;
+                    float bw = sz.Width + radius * (previewMode ? 0.06f : 0.08f);
+                    float bh = sz.Height + radius * 0.02f;
                     float bx = cx - bw / 2f;
-                    float by = cy + radius * 0.40f - bh / 2f;
+                    float by = cy + radius * 0.38f - bh / 2f;
 
                     GraphicsPath path = RoundedRect(new RectangleF(bx, by, bw, bh), Math.Max(2f, radius * 0.02f));
                     g.FillPath(dateBgBrush, path);
                     g.DrawPath(dateBorderPen, path);
-                    g.DrawString(dateStr, dateFont, dateTextBrush, cx, cy + radius * 0.40f, sf);
+                    g.DrawString(dateStr, dateFont, dateTextBrush, cx, cy + radius * 0.38f, sf);
                 }
             }
 
