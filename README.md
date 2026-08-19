@@ -7,9 +7,10 @@
 
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![Language](https://img.shields.io/badge/C%23-Native%20.NET-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![Mode](https://img.shields.io/badge/Mode-Analog%20%26%20Digital%20Flip-ff69b4?style=for-the-badge)
 ![Performance](https://img.shields.io/badge/Startup-0ms%20Instant-success?style=for-the-badge&logo=speedtest&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+[![GitHub Repository](https://img.shields.io/badge/GitHub-SulthanRaghib%2Fchroniq--screensaver-181717?style=for-the-badge&logo=github)](https://github.com/SulthanRaghib/chroniq-screensaver)
 
 <p align="center">
   <b>Screensaver Jam All-in-One (Analog & Digital) Modern, Elegan, dan Berperforma Tinggi untuk Windows.</b><br>
@@ -21,7 +22,8 @@
 [📋 Prasyarat](#-prasyarat-sistem) •
 [📁 Struktur Proyek](#-susunan-struktur-proyek) •
 [🚀 Cara Pasang & Pakai](#-cara-pemasangan--penggunaan) •
-[🧠 Logika & Arsitektur](#-arsitektur-dan-logika-sistem)
+[🧠 Logika & Arsitektur](#-arsitektur-dan-logika-sistem) •
+[🌐 Repositori GitHub](https://github.com/SulthanRaghib/chroniq-screensaver)
 
 ---
 

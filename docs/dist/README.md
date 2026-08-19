@@ -23,5 +23,10 @@ Chroniq adalah screensaver jam estetis performa tinggi untuk Windows 10 & 11 den
 
 ---
 
+## 🌐 Repositori Resmi GitHub:
+[https://github.com/SulthanRaghib/chroniq-screensaver](https://github.com/SulthanRaghib/chroniq-screensaver)
+
+---
+
 ## ⚙️ Kustomisasi:
 Buka pengaturan Windows Screensaver (*Screen Saver Settings*) -> Pilih **Chroniq** -> Klik **Settings...**.
