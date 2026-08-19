@@ -30,7 +30,13 @@ namespace Chroniq
                 string firstArg = args[0].ToLower().Trim();
                 string secondArg = args.Length > 1 ? args[1] : null;
 
-                if (firstArg.Contains("install") || firstArg.Contains("setup"))
+                if (firstArg.Contains("uninstall") || firstArg.Contains("remove"))
+                {
+                    // Direct uninstallation command
+                    InstallerHelper.UninstallFromWindows();
+                    return;
+                }
+                else if (firstArg.Contains("install") || firstArg.Contains("setup"))
                 {
                     // Direct installation command
                     InstallerHelper.InstallToWindows();

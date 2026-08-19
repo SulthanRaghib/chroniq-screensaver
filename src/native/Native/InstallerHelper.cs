@@ -117,5 +117,88 @@ namespace Chroniq.Native
                 return false;
             }
         }
+
+        public static bool UninstallFromWindows(bool showSuccessMessage = true)
+        {
+            try
+            {
+                string currentExe = Application.ExecutablePath;
+
+                if (!IsAdministrator())
+                {
+                    ProcessStartInfo psi = new ProcessStartInfo();
+                    psi.FileName = currentExe;
+                    psi.Arguments = "/uninstall";
+                    psi.Verb = "runas";
+                    psi.UseShellExecute = true;
+
+                    try
+                    {
+                        Process.Start(psi);
+                        return true;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+
+                // 1. Terminate running instances
+                try
+                {
+                    foreach (var proc in Process.GetProcessesByName("Chroniq"))
+                    {
+                        if (proc.Id != Process.GetCurrentProcess().Id)
+                        {
+                            try { proc.Kill(); } catch { }
+                        }
+                    }
+                }
+                catch { }
+
+                // 2. Delete files from system folders
+                string systemDir = Environment.GetFolderPath(Environment.SpecialFolder.System);
+                string targetScr = Path.Combine(systemDir, "Chroniq.scr");
+                if (File.Exists(targetScr))
+                {
+                    try { File.Delete(targetScr); } catch { }
+                }
+
+                string sysRoot = Environment.GetEnvironmentVariable("SystemRoot");
+                if (!string.IsNullOrEmpty(sysRoot))
+                {
+                    string sysWow64 = Path.Combine(sysRoot, "SysWOW64");
+                    string wow64Scr = Path.Combine(sysWow64, "Chroniq.scr");
+                    if (File.Exists(wow64Scr))
+                    {
+                        try { File.Delete(wow64Scr); } catch { }
+                    }
+                }
+
+                // 3. Reset Registry
+                try
+                {
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "SCRNSAVE.EXE", "");
+                    Microsoft.Win32.Registry.SetValue(@"HKEY_CURRENT_USER\Control Panel\Desktop", "ScreenSaveActive", "0");
+                }
+                catch { }
+
+                if (showSuccessMessage)
+                {
+                    MessageBox.Show(
+                        "Chroniq Screensaver telah berhasil di-uninstall dan dihapus dari sistem Windows.",
+                        "Chroniq Uninstaller",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Gagal mencopot screensaver: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
     }
 }
