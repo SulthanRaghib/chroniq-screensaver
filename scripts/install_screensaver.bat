@@ -1,24 +1,40 @@
 @echo off
 title Install Chroniq Screensaver
+
+:: 1. Auto-request Administrator elevation (UAC Prompt)
+net session >nul 2>&1
+if %errorLevel% neq 0 (
+    echo ==================================================
+    echo   MEMINTA IZIN ADMINISTRATOR (UAC)...
+    echo ==================================================
+    powershell -Command "Start-Process '%~f0' -Verb RunAs"
+    exit /b
+)
+
+:: 2. Running with Admin privileges:
 echo ==================================================
-echo   INSTALLING CHRONIQ SCREENSAVER KE WINDOWS
+echo   MEMASANG CHRONIQ SCREENSAVER KE SISTEM WINDOWS
 echo ==================================================
 echo.
 
-:: 1. Copy to user LocalAppData folder (Tidak perlu Run as Administrator)
-set "TARGET_DIR=%LOCALAPPDATA%\ChroniqScreensaver"
-if not exist "%TARGET_DIR%" mkdir "%TARGET_DIR%"
-copy /y "%~dp0..\dist\Chroniq.scr" "%TARGET_DIR%\Chroniq.scr" >nul
-copy /y "%~dp0..\dist\Chroniq.exe" "%TARGET_DIR%\Chroniq.exe" >nul
+:: Tutup instance lama jika ada
+taskkill /f /im Chroniq.scr 2>nul
+taskkill /f /im Chroniq.exe 2>nul
 
-:: 2. Register ke Windows Screensaver Registry
-reg add "HKCU\Control Panel\Desktop" /v SCRNSAVE.EXE /t REG_SZ /d "%TARGET_DIR%\Chroniq.scr" /f >nul
+:: Copy ke folder sistem Windows (System32 & SysWOW64)
+copy /y "%~dp0..\dist\Chroniq.scr" "%SystemRoot%\System32\Chroniq.scr" >nul
+if exist "%SystemRoot%\SysWOW64" (
+    copy /y "%~dp0..\dist\Chroniq.scr" "%SystemRoot%\SysWOW64\Chroniq.scr" >nul
+)
+
+:: Daftarkan ke Registry Windows sebagai Screensaver Aktif
+reg add "HKCU\Control Panel\Desktop" /v SCRNSAVE.EXE /t REG_SZ /d "%SystemRoot%\System32\Chroniq.scr" /f >nul
 reg add "HKCU\Control Panel\Desktop" /v ScreenSaveActive /t REG_SZ /d "1" /f >nul
 
-:: 3. Jalankan dialog screensaver resmi Windows
-start "" rundll32.exe desk.cpl,InstallScreenSaver "%TARGET_DIR%\Chroniq.scr"
+:: Buka dialog pengaturan screensaver resmi Windows
+start "" rundll32.exe desk.cpl,InstallScreenSaver "%SystemRoot%\System32\Chroniq.scr"
 
-echo [BERHASIL] Chroniq Screensaver berhasil dipasang ke sistem Windows!
-echo Jendela pengaturan screensaver Windows telah terbuka dengan Chroniq aktif.
+echo [SUKSES] Chroniq Screensaver berhasil dipasang ke sistem Windows!
+echo Nama 'Chroniq' sekarang muncul permanen di menu dropdown Windows.
 echo.
 pause
