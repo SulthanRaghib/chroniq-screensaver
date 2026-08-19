@@ -32,16 +32,24 @@ class ClockColors:
 
 @dataclass
 class ClockConfig:
+    # Mode: "analog" | "digital"
+    clock_mode: str = "analog"
+
     # Preset & General
     preset_name: str = "Modern Dark"
     style: str = "modern"  # 'modern', 'classic', 'bauhaus', 'sport', 'minimal'
     numeral_type: str = "arabic"  # 'arabic', 'roman', 'dots', 'lines', 'none'
     
-    # Hand Toggles
+    # Hand Toggles (Analog)
     show_hour_hand: bool = True
     show_minute_hand: bool = True
     show_second_hand: bool = True
     
+    # Digital Options
+    digital_style: str = "flip"  # 'flip', 'minimal'
+    use_24_hour: bool = True
+    show_digital_seconds: bool = True
+
     # Animation & Behavior
     smooth_sweep: bool = True
     show_date: bool = True
@@ -81,12 +89,16 @@ class ClockConfig:
         )
         
         return cls(
+            clock_mode=data.get("clock_mode", "analog"),
             preset_name=data.get("preset_name", "Modern Dark"),
             style=data.get("style", "modern"),
             numeral_type=data.get("numeral_type", "arabic"),
             show_hour_hand=data.get("show_hour_hand", True),
             show_minute_hand=data.get("show_minute_hand", True),
             show_second_hand=data.get("show_second_hand", True),
+            digital_style=data.get("digital_style", "flip"),
+            use_24_hour=data.get("use_24_hour", True),
+            show_digital_seconds=data.get("show_digital_seconds", True),
             smooth_sweep=data.get("smooth_sweep", True),
             show_date=data.get("show_date", True),
             show_dial_border=data.get("show_dial_border", True),

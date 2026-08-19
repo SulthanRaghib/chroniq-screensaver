@@ -149,6 +149,10 @@ class ClockRenderer:
         if radius < 20:
             return
 
+        if getattr(self.config, "clock_mode", "analog") == "digital":
+            self._render_digital_clock(surface, center_x, center_y, min_dim, now)
+            return
+
         # 3. Draw Dial Face & Borders
         self._render_dial_face(surface, center_x, center_y, radius)
 
@@ -529,3 +533,94 @@ class ClockRenderer:
             cw_cy = cy - (counter_len * 0.65) * sin_a
             cw_r = max(2, int(round(radius * 0.022)))
             self._draw_aa_circle(surface, int(round(cw_cx)), int(round(cw_cy)), cw_r, color)
+
+    def _render_digital_clock(self, surface: pygame.Surface, cx: int, cy: int, min_dim: int, now: datetime) -> None:
+        """Renders Fliqlo-style flip cards or minimal digital clock."""
+        scale = getattr(self.config, "clock_scale", 0.72)
+        base_size = min_dim * scale
+        
+        use_24h = getattr(self.config, "use_24_hour", True)
+        show_sec = getattr(self.config, "show_digital_seconds", True)
+        is_flip = getattr(self.config, "digital_style", "flip") == "flip"
+
+        hour_val = now.hour if use_24h else (12 if now.hour % 12 == 0 else now.hour % 12)
+        hr_str = f"{hour_val:02d}"
+        min_str = f"{now.minute:02d}"
+        sec_str = f"{now.second:02d}"
+        ampm_str = "PM" if now.hour >= 12 else "AM"
+
+        card_h = int(base_size * 0.46)
+        card_w = int(card_h * 0.90)
+        sec_card_w = int(card_w * 0.65)
+        sec_card_h = int(card_h * 0.65)
+        gap = int(base_size * 0.035)
+
+        total_w = (card_w * 2 + sec_card_w + gap * 2) if show_sec else (card_w * 2 + gap)
+        start_x = cx - total_w // 2
+        start_y = cy - card_h // 2 - (int(base_size * 0.05) if self.config.show_date else 0)
+
+        card_bg = hex_to_rgb(self.config.colors.dial_face)
+        card_border = hex_to_rgb(self.config.colors.dial_border)
+        digit_color = hex_to_rgb(self.config.colors.numerals)
+        sec_color = hex_to_rgb(self.config.colors.second_hand)
+
+        # 1. Hour Card
+        self._draw_digital_tile(surface, start_x, start_y, card_w, card_h, hr_str, digit_color, card_bg, card_border, is_flip, None if use_24h else ampm_str)
+
+        # 2. Minute Card
+        self._draw_digital_tile(surface, start_x + card_w + gap, start_y, card_w, card_h, min_str, digit_color, card_bg, card_border, is_flip, None)
+
+        # 3. Seconds Card (if enabled)
+        if show_sec:
+            sec_y = start_y + (card_h - sec_card_h)
+            self._draw_digital_tile(surface, start_x + card_w * 2 + gap * 2, sec_y, sec_card_w, sec_card_h, sec_str, sec_color, card_bg, card_border, is_flip, None)
+
+        # 4. Date Badge
+        if self.config.show_date:
+            date_str = self._get_formatted_date_str(now)
+            font_size = max(12, int(round(base_size * 0.052)))
+            font = self._get_font(None, font_size, bold=True)
+            text_surf = font.render(date_str, True, hex_to_rgb(self.config.colors.date_text))
+
+            badge_w = text_surf.get_width() + int(base_size * 0.08)
+            badge_h = text_surf.get_height() + int(base_size * 0.03)
+            badge_x = cx - badge_w // 2
+            badge_y = start_y + card_h + int(base_size * 0.06)
+
+            badge_rect = pygame.Rect(badge_x, badge_y, badge_w, badge_h)
+            badge_bg = hex_to_rgb(self.config.colors.date_badge_bg)
+            border_radius = max(3, int(base_size * 0.015))
+
+            pygame.draw.rect(surface, badge_bg, badge_rect, border_radius=border_radius)
+            if self.config.show_dial_border:
+                pygame.draw.rect(surface, card_border, badge_rect, width=1, border_radius=border_radius)
+            
+            t_rect = text_surf.get_rect(center=badge_rect.center)
+            surface.blit(text_surf, t_rect)
+
+    def _draw_digital_tile(self, surface: pygame.Surface, x: int, y: int, w: int, h: int, text: str, text_color: Tuple[int, int, int], bg_color: Tuple[int, int, int], border_color: Tuple[int, int, int], is_flip: bool, badge_text: str | None) -> None:
+        rect = pygame.Rect(x, y, w, h)
+        corner_r = max(4, int(h * 0.08))
+
+        if is_flip:
+            pygame.draw.rect(surface, bg_color, rect, border_radius=corner_r)
+            if self.config.show_dial_border:
+                pygame.draw.rect(surface, border_color, rect, width=max(1, int(h * 0.012)), border_radius=corner_r)
+
+            # Center crease / split groove
+            mid_y = y + h // 2
+            pygame.draw.line(surface, (10, 10, 15), (x, mid_y), (x + w, mid_y), max(1, int(h * 0.012)))
+            pygame.draw.line(surface, (70, 70, 80), (x, mid_y + 1), (x + w, mid_y + 1), 1)
+
+        # Draw Large Digits
+        font_size = max(16, int(round(h * 0.62)))
+        font = self._get_font(None, font_size, bold=True)
+        t_surf = font.render(text, True, text_color)
+        t_rect = t_surf.get_rect(center=rect.center)
+        surface.blit(t_surf, t_rect)
+
+        # AM/PM badge
+        if badge_text:
+            badge_font = self._get_font(None, max(9, int(h * 0.12)), bold=True)
+            b_surf = badge_font.render(badge_text, True, text_color)
+            surface.blit(b_surf, (x + int(w * 0.08), y + int(h * 0.07)))

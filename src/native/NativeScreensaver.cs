@@ -11,6 +11,10 @@ namespace AnalogClockScreensaver
 {
     public class ClockConfig
     {
+        // Mode: "analog" | "digital"
+        public string ClockMode = "analog";
+
+        // Analog Options
         public string PresetName = "Modern Dark";
         public string Style = "modern"; // modern, classic, bauhaus, sport, minimal
         public string NumeralType = "arabic"; // arabic, roman, dots, lines, none
@@ -18,8 +22,15 @@ namespace AnalogClockScreensaver
         public bool ShowMinuteHand = true;
         public bool ShowSecondHand = true;
         public bool SmoothSweep = true;
-        public bool ShowDate = true;
         public bool ShowDialBorder = true;
+
+        // Digital Options
+        public string DigitalStyle = "flip"; // "flip", "minimal"
+        public bool Use24Hour = true;
+        public bool ShowDigitalSeconds = true;
+
+        // Common Display Options
+        public bool ShowDate = true;
         public bool AntiBurnIn = true;
         public float ClockScale = 0.72f;
         public string DateFormatLanguage = "system"; // system, id, en, full_id, full_en, numeric
@@ -166,6 +177,7 @@ namespace AnalogClockScreensaver
         private static ClockConfig ParseJson(string json)
         {
             ClockConfig c = new ClockConfig();
+            c.ClockMode = GetJsonVal(json, "clock_mode", "analog");
             c.PresetName = GetJsonVal(json, "preset_name", c.PresetName);
             c.Style = GetJsonVal(json, "style", c.Style);
             c.NumeralType = GetJsonVal(json, "numeral_type", c.NumeralType);
@@ -177,6 +189,11 @@ namespace AnalogClockScreensaver
             c.ShowDialBorder = GetJsonVal(json, "show_dial_border", "true").ToLower() == "true";
             c.AntiBurnIn = GetJsonVal(json, "anti_burn_in", "true").ToLower() == "true";
             c.DateFormatLanguage = GetJsonVal(json, "date_format_lang", "system");
+
+            // Digital parsing
+            c.DigitalStyle = GetJsonVal(json, "digital_style", "flip");
+            c.Use24Hour = GetJsonVal(json, "use_24_hour", "true").ToLower() == "true";
+            c.ShowDigitalSeconds = GetJsonVal(json, "show_digital_seconds", "true").ToLower() == "true";
 
             float sc;
             if (float.TryParse(GetJsonVal(json, "clock_scale", "0.72"), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out sc)) c.ClockScale = sc;
@@ -199,6 +216,7 @@ namespace AnalogClockScreensaver
         public string ToJson()
         {
             return "{\n" +
+                "  \"clock_mode\": \"" + ClockMode + "\",\n" +
                 "  \"preset_name\": \"" + PresetName + "\",\n" +
                 "  \"style\": \"" + Style + "\",\n" +
                 "  \"numeral_type\": \"" + NumeralType + "\",\n" +
@@ -210,6 +228,9 @@ namespace AnalogClockScreensaver
                 "  \"show_dial_border\": " + (ShowDialBorder ? "true" : "false") + ",\n" +
                 "  \"anti_burn_in\": " + (AntiBurnIn ? "true" : "false") + ",\n" +
                 "  \"date_format_lang\": \"" + DateFormatLanguage + "\",\n" +
+                "  \"digital_style\": \"" + DigitalStyle + "\",\n" +
+                "  \"use_24_hour\": " + (Use24Hour ? "true" : "false") + ",\n" +
+                "  \"show_digital_seconds\": " + (ShowDigitalSeconds ? "true" : "false") + ",\n" +
                 "  \"clock_scale\": " + ClockScale.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture) + ",\n" +
                 "  \"colors\": {\n" +
                 "    \"background\": \"" + BgColor + "\",\n" +
@@ -234,6 +255,13 @@ namespace AnalogClockScreensaver
         private ClockConfig config;
         private bool isUpdatingUI = false;
 
+        // Mode
+        private RadioButton rbAnalog;
+        private RadioButton rbDigital;
+
+        // Analog options
+        private GroupBox gbStyle;
+        private GroupBox gbHands;
         private ComboBox cbPreset;
         private ComboBox cbStyle;
         private ComboBox cbNumeral;
@@ -241,8 +269,16 @@ namespace AnalogClockScreensaver
         private CheckBox chkMin;
         private CheckBox chkSec;
         private CheckBox chkSweep;
-        private CheckBox chkDate;
         private CheckBox chkBorder;
+
+        // Digital options
+        private GroupBox gbDigital;
+        private ComboBox cbDigitalStyle;
+        private CheckBox chk24Hour;
+        private CheckBox chkDigitalSec;
+
+        // Common options
+        private CheckBox chkDate;
         private CheckBox chkAntiBurn;
         private ComboBox cbDateLang;
         private TrackBar tbScale;
@@ -260,8 +296,8 @@ namespace AnalogClockScreensaver
 
         private void InitUI()
         {
-            this.Text = "Pengaturan Screensaver Jam Analog";
-            this.Size = new Size(620, 720);
+            this.Text = "Pengaturan Screensaver Jam (Analog & Digital)";
+            this.Size = new Size(640, 780);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -274,7 +310,7 @@ namespace AnalogClockScreensaver
             tabs.Dock = DockStyle.Fill;
             tabs.Padding = new Point(14, 6);
 
-            TabPage tabGeneral = new TabPage("  Gaya & Jarum  ");
+            TabPage tabGeneral = new TabPage("  Mode & Gaya Jam  ");
             tabGeneral.BackColor = Color.White;
             tabGeneral.AutoScroll = true;
 
@@ -291,7 +327,6 @@ namespace AnalogClockScreensaver
             bottomPanel.Height = 58;
             bottomPanel.BackColor = Color.FromArgb(226, 232, 240);
 
-            // Test Preview Button
             Button btnPreview = new Button();
             btnPreview.Text = "👁️ Test Preview";
             btnPreview.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
@@ -309,7 +344,7 @@ namespace AnalogClockScreensaver
                 {
                     previewForm.ShowDialog();
                 }
-                Cursor.Show(); // Always guarantee cursor is shown upon returning
+                Cursor.Show();
             };
 
             Button btnSave = new Button();
@@ -320,7 +355,7 @@ namespace AnalogClockScreensaver
             btnSave.FlatStyle = FlatStyle.Flat;
             btnSave.FlatAppearance.BorderSize = 0;
             btnSave.Size = new Size(145, 36);
-            btnSave.Location = new Point(445, 11);
+            btnSave.Location = new Point(460, 11);
             btnSave.Cursor = Cursors.Hand;
             btnSave.Click += (s, e) => SaveAndClose();
 
@@ -331,7 +366,7 @@ namespace AnalogClockScreensaver
             btnCancel.FlatStyle = FlatStyle.Flat;
             btnCancel.FlatAppearance.BorderSize = 0;
             btnCancel.Size = new Size(80, 36);
-            btnCancel.Location = new Point(355, 11);
+            btnCancel.Location = new Point(370, 11);
             btnCancel.Cursor = Cursors.Hand;
             btnCancel.Click += (s, e) => this.Close();
 
@@ -351,31 +386,41 @@ namespace AnalogClockScreensaver
         {
             int y = 14;
 
-            // 1. Preset Group
+            // 0. Mode Selector Group
+            GroupBox gbMode = new GroupBox();
+            gbMode.Text = " ⏱️ Pilih Mode Tampilan Screensaver ";
+            gbMode.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
+            gbMode.ForeColor = Color.FromArgb(30, 41, 59);
+            gbMode.Location = new Point(14, y);
+            gbMode.Size = new Size(580, 65);
+
+            rbAnalog = new RadioButton { Text = "Jam Analog 🕰️", Font = new Font("Segoe UI", 9.5F, FontStyle.Bold), Location = new Point(30, 25), AutoSize = true, Checked = true };
+            rbDigital = new RadioButton { Text = "Jam Digital (Flip / Modern) 🔢", Font = new Font("Segoe UI", 9.5F, FontStyle.Bold), Location = new Point(220, 25), AutoSize = true };
+
+            rbAnalog.CheckedChanged += (s, e) => UpdateModeUI();
+            rbDigital.CheckedChanged += (s, e) => UpdateModeUI();
+
+            gbMode.Controls.Add(rbAnalog);
+            gbMode.Controls.Add(rbDigital);
+            page.Controls.Add(gbMode);
+            y += 75;
+
+            // 1. Preset Group (For Analog & Digital theme palettes)
             GroupBox gbPreset = new GroupBox();
-            gbPreset.Text = " 🎨 Tema & Preset Siap Pakai ";
+            gbPreset.Text = " 🎨 Tema & Preset Warna ";
             gbPreset.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             gbPreset.Location = new Point(14, y);
-            gbPreset.Size = new Size(560, 68);
+            gbPreset.Size = new Size(580, 65);
 
-            Label lblP = new Label();
-            lblP.Text = "Pilih Preset:";
-            lblP.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
-            lblP.Location = new Point(16, 28);
-            lblP.AutoSize = true;
-
-            cbPreset = new ComboBox();
-            cbPreset.DropDownStyle = ComboBoxStyle.DropDownList;
-            cbPreset.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
+            Label lblP = new Label { Text = "Pilih Preset:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 26), AutoSize = true };
+            cbPreset = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(110, 23), Size = new Size(260, 25) };
             cbPreset.Items.AddRange(new object[] {
                 "Modern Dark", "Fliqlo Monochrome", "Classic Vintage Roman",
                 "Swiss Railway (Bauhaus)", "Midnight Sapphire", "Cyberpunk Neon",
                 "Minimal Slate", "Emerald Luxury", "Custom"
             });
-            cbPreset.Location = new Point(110, 25);
-            cbPreset.Size = new Size(260, 25);
             cbPreset.SelectedIndexChanged += (s, e) => {
-                if (isUpdatingUI) return; // Prevent overwriting loaded settings!
+                if (isUpdatingUI) return;
                 if (cbPreset.SelectedItem != null && cbPreset.SelectedItem.ToString() != "Custom")
                 {
                     config.ApplyPreset(cbPreset.SelectedItem.ToString());
@@ -386,14 +431,34 @@ namespace AnalogClockScreensaver
             gbPreset.Controls.Add(lblP);
             gbPreset.Controls.Add(cbPreset);
             page.Controls.Add(gbPreset);
-            y += 78;
+            y += 75;
 
-            // 2. Style & Numerals Group
-            GroupBox gbStyle = new GroupBox();
-            gbStyle.Text = " 🕰️ Desain Jam & Penanda ";
+            // 2. Digital Options Group
+            gbDigital = new GroupBox();
+            gbDigital.Text = " 🔢 Opsi Jam Digital ";
+            gbDigital.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
+            gbDigital.Location = new Point(14, y);
+            gbDigital.Size = new Size(580, 100);
+
+            Label lblDigSt = new Label { Text = "Gaya Tampilan Digital:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 26), AutoSize = true };
+            cbDigitalStyle = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(170, 23), Size = new Size(220, 25) };
+            cbDigitalStyle.Items.AddRange(new object[] { "flip (Kartu Flip ala Fliqlo)", "minimal (Teks Bersih Tanpa Kartu)" });
+
+            chk24Hour = new CheckBox { Text = "Gunakan Format 24 Jam (Contoh: 23:50 vs 11:50 PM)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 60), AutoSize = true };
+            chkDigitalSec = new CheckBox { Text = "Tampilkan Detik Digital", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(350, 60), AutoSize = true };
+
+            gbDigital.Controls.Add(lblDigSt);
+            gbDigital.Controls.Add(cbDigitalStyle);
+            gbDigital.Controls.Add(chk24Hour);
+            gbDigital.Controls.Add(chkDigitalSec);
+            page.Controls.Add(gbDigital);
+
+            // 3. Style & Numerals Group (Analog)
+            gbStyle = new GroupBox();
+            gbStyle.Text = " 🕰️ Desain Jam & Penanda (Khusus Analog) ";
             gbStyle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            gbStyle.Location = new Point(14, y);
-            gbStyle.Size = new Size(560, 95);
+            gbStyle.Location = new Point(14, y + 110);
+            gbStyle.Size = new Size(580, 95);
 
             Label lblSt = new Label { Text = "Gaya Desain:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 26), AutoSize = true };
             cbStyle = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(150, 23), Size = new Size(200, 25) };
@@ -406,14 +471,13 @@ namespace AnalogClockScreensaver
             gbStyle.Controls.Add(lblSt); gbStyle.Controls.Add(cbStyle);
             gbStyle.Controls.Add(lblNum); gbStyle.Controls.Add(cbNumeral);
             page.Controls.Add(gbStyle);
-            y += 105;
 
-            // 3. Hands & Motion Group
-            GroupBox gbHands = new GroupBox();
-            gbHands.Text = " ⏱️ Opsi Jarum Jam & Animasi ";
+            // 4. Hands & Motion Group (Analog)
+            gbHands = new GroupBox();
+            gbHands.Text = " ⏱️ Opsi Jarum Jam & Animasi (Khusus Analog) ";
             gbHands.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            gbHands.Location = new Point(14, y);
-            gbHands.Size = new Size(560, 130);
+            gbHands.Location = new Point(14, y + 215);
+            gbHands.Size = new Size(580, 130);
 
             chkHour = new CheckBox { Text = "Tampilkan Jarum Jam (Hour Hand)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 24), AutoSize = true };
             chkMin = new CheckBox { Text = "Tampilkan Jarum Menit (Minute Hand)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 48), AutoSize = true };
@@ -422,20 +486,18 @@ namespace AnalogClockScreensaver
 
             gbHands.Controls.Add(chkHour); gbHands.Controls.Add(chkMin); gbHands.Controls.Add(chkSec); gbHands.Controls.Add(chkSweep);
             page.Controls.Add(gbHands);
-            y += 140;
 
-            // 4. Display, Language & Scale Group
+            // 5. Display, Language & Scale Group (Common)
             GroupBox gbDisp = new GroupBox();
             gbDisp.Text = " 📐 Fitur Layar & Bahasa Tanggal ";
             gbDisp.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            gbDisp.Location = new Point(14, y);
-            gbDisp.Size = new Size(560, 180);
+            gbDisp.Location = new Point(14, y + 355);
+            gbDisp.Size = new Size(580, 180);
 
             chkDate = new CheckBox { Text = "Tampilkan Tanggal & Hari", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 24), AutoSize = true };
-            chkBorder = new CheckBox { Text = "Tampilkan Garis Tepi Dial", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 48), AutoSize = true };
-            chkAntiBurn = new CheckBox { Text = "Anti-Burn-In Protection (Pergeseran Mikro OLED)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 72), AutoSize = true };
+            chkBorder = new CheckBox { Text = "Tampilkan Garis Tepi (Dial Border / Card Border)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 48), AutoSize = true };
+            chkAntiBurn = new CheckBox { Text = "Anti-Burn-In Protection (Pergeseran Mikro Layar OLED)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 72), AutoSize = true };
 
-            // Date language dropdown
             Label lblDateLang = new Label { Text = "Bahasa & Format Tanggal:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 102), AutoSize = true };
             cbDateLang = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(180, 99), Size = new Size(260, 25) };
             cbDateLang.Items.AddRange(new object[] {
@@ -458,19 +520,30 @@ namespace AnalogClockScreensaver
             page.Controls.Add(gbDisp);
         }
 
+        private void UpdateModeUI()
+        {
+            bool isDigital = rbDigital.Checked;
+            gbDigital.Enabled = isDigital;
+            gbDigital.Visible = isDigital;
+
+            // When digital mode is active, analog hands/dial groups are subtle or disabled
+            gbStyle.Enabled = !isDigital;
+            gbHands.Enabled = !isDigital;
+        }
+
         private void BuildColorsTab(TabPage page)
         {
             int y = 14;
             btnBg = CreateColorRow(page, "Latar Belakang Layar (Background):", ref y);
-            btnDial = CreateColorRow(page, "Permukaan Piringan Jam (Dial Face):", ref y);
-            btnBorder = CreateColorRow(page, "Garis Batas Piringan (Dial Border):", ref y);
+            btnDial = CreateColorRow(page, "Permukaan Piringan / Kartu Digital (Dial / Card Face):", ref y);
+            btnBorder = CreateColorRow(page, "Garis Batas Piringan / Kartu (Border):", ref y);
             btnHourM = CreateColorRow(page, "Garis Penanda Jam (Hour Markers):", ref y);
             btnMinM = CreateColorRow(page, "Garis Penanda Menit (Minute Markers):", ref y);
-            btnNum = CreateColorRow(page, "Teks Angka Jam (Numerals):", ref y);
+            btnNum = CreateColorRow(page, "Teks Angka Jam (Numerals / Digital Digits):", ref y);
             btnHourH = CreateColorRow(page, "Jarum Jam (Hour Hand):", ref y);
             btnMinH = CreateColorRow(page, "Jarum Menit (Minute Hand):", ref y);
-            btnSecH = CreateColorRow(page, "Jarum Detik (Second Hand):", ref y);
-            btnAccent = CreateColorRow(page, "Titik Poros Tengah (Accent Pin):", ref y);
+            btnSecH = CreateColorRow(page, "Jarum Detik / Aksen Digital (Seconds / Accent):", ref y);
+            btnAccent = CreateColorRow(page, "Titik Poros Tengah / Divider Lipatan (Accent):", ref y);
             btnDateBg = CreateColorRow(page, "Kotak Latar Tanggal (Date Box BG):", ref y);
             btnDateText = CreateColorRow(page, "Teks Tanggal (Date Text):", ref y);
         }
@@ -480,12 +553,12 @@ namespace AnalogClockScreensaver
             Label lbl = new Label();
             lbl.Text = label;
             lbl.Location = new Point(16, y + 4);
-            lbl.Size = new Size(280, 20);
+            lbl.Size = new Size(300, 20);
             page.Controls.Add(lbl);
 
             Button btn = new Button();
             btn.Size = new Size(130, 26);
-            btn.Location = new Point(310, y);
+            btn.Location = new Point(330, y);
             btn.FlatStyle = FlatStyle.Flat;
             btn.Cursor = Cursors.Hand;
             btn.Font = new Font("Consolas", 8.5F, FontStyle.Bold);
@@ -531,6 +604,9 @@ namespace AnalogClockScreensaver
             isUpdatingUI = true;
             try
             {
+                if (config.ClockMode == "digital") rbDigital.Checked = true;
+                else rbAnalog.Checked = true;
+
                 if (cbPreset.Items.Contains(config.PresetName)) cbPreset.SelectedItem = config.PresetName;
                 else cbPreset.SelectedItem = "Custom";
 
@@ -544,6 +620,12 @@ namespace AnalogClockScreensaver
                 chkDate.Checked = config.ShowDate;
                 chkBorder.Checked = config.ShowDialBorder;
                 chkAntiBurn.Checked = config.AntiBurnIn;
+
+                // Digital
+                if (config.DigitalStyle == "minimal") cbDigitalStyle.SelectedIndex = 1;
+                else cbDigitalStyle.SelectedIndex = 0; // flip
+                chk24Hour.Checked = config.Use24Hour;
+                chkDigitalSec.Checked = config.ShowDigitalSeconds;
 
                 // Date Lang Mapping
                 if (config.DateFormatLanguage == "id") cbDateLang.SelectedIndex = 1;
@@ -569,6 +651,8 @@ namespace AnalogClockScreensaver
                 SetColorBtn(btnAccent, config.AccentCenterColor);
                 SetColorBtn(btnDateBg, config.DateBadgeBgColor);
                 SetColorBtn(btnDateText, config.DateTextColor);
+
+                UpdateModeUI();
             }
             finally
             {
@@ -578,6 +662,7 @@ namespace AnalogClockScreensaver
 
         private void SyncUIToConfig()
         {
+            config.ClockMode = rbDigital.Checked ? "digital" : "analog";
             config.PresetName = cbPreset.SelectedItem != null ? cbPreset.SelectedItem.ToString() : "Custom";
             config.Style = cbStyle.SelectedItem != null ? cbStyle.SelectedItem.ToString() : "modern";
             config.NumeralType = cbNumeral.SelectedItem != null ? cbNumeral.SelectedItem.ToString() : "arabic";
@@ -590,6 +675,11 @@ namespace AnalogClockScreensaver
             config.ShowDialBorder = chkBorder.Checked;
             config.AntiBurnIn = chkAntiBurn.Checked;
             config.ClockScale = tbScale.Value / 100.0f;
+
+            // Digital sync
+            config.DigitalStyle = (cbDigitalStyle.SelectedIndex == 1) ? "minimal" : "flip";
+            config.Use24Hour = chk24Hour.Checked;
+            config.ShowDigitalSeconds = chkDigitalSec.Checked;
 
             // Date Lang Sync
             int dIdx = cbDateLang.SelectedIndex;
@@ -618,7 +708,7 @@ namespace AnalogClockScreensaver
         {
             SyncUIToConfig();
             config.Save();
-            MessageBox.Show("Pengaturan jam analog berhasil disimpan!", "Berhasil", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Pengaturan jam screensaver berhasil disimpan!", "Berhasil", MessageBoxButtons.OK, MessageBoxIcon.Information);
             this.Close();
         }
     }
@@ -708,7 +798,7 @@ namespace AnalogClockScreensaver
         private void SetupTimer()
         {
             timer = new Timer();
-            timer.Interval = config.SmoothSweep ? 16 : 50; // ~60 FPS
+            timer.Interval = (config.ClockMode == "analog" && config.SmoothSweep) ? 16 : 50; // ~60 FPS or smooth 20 FPS
             timer.Tick += (s, e) => this.Invalidate();
             timer.Start();
         }
@@ -784,11 +874,10 @@ namespace AnalogClockScreensaver
             int w = this.ClientSize.Width;
             int h = this.ClientSize.Height;
 
-            // In preview mode, always resize to fit parent exactly
             if (previewMode && previewParentHwnd != IntPtr.Zero)
             {
                 Rectangle parentRect;
-                if (GetClientRect(previewParentHwnd, out parentRect))
+                if (GetClientRect(previewParentHwnd, out parentRect) && parentRect.Width > 0 && parentRect.Height > 0)
                 {
                     w = parentRect.Width;
                     h = parentRect.Height;
@@ -803,6 +892,151 @@ namespace AnalogClockScreensaver
                 driftY = (int)(Math.Cos(elapsedSec / 160.0 * 2 * Math.PI) * 14.0);
             }
 
+            if (config.ClockMode == "digital")
+            {
+                RenderDigitalClock(g, w, h, driftX, driftY, now);
+            }
+            else
+            {
+                RenderAnalogClock(g, w, h, driftX, driftY, now);
+            }
+        }
+
+        private void RenderDigitalClock(Graphics g, int w, int h, int driftX, int driftY, DateTime now)
+        {
+            float scale = previewMode ? 0.85f : config.ClockScale;
+            float cx = (w / 2f) + driftX;
+            float cy = (h / 2f) + driftY;
+
+            // Compute hour and minute strings
+            int hourVal = config.Use24Hour ? now.Hour : (now.Hour % 12 == 0 ? 12 : now.Hour % 12);
+            string hrStr = hourVal.ToString("00");
+            string minStr = now.Minute.ToString("00");
+            string secStr = now.Second.ToString("00");
+            string ampmStr = now.Hour >= 12 ? "PM" : "AM";
+
+            bool isFlip = config.DigitalStyle == "flip";
+            bool showSec = config.ShowDigitalSeconds;
+
+            Color cardBgColor = ParseColor(config.DialColor, Color.FromArgb(24, 24, 24));
+            Color cardBorderColor = ParseColor(config.BorderColor, Color.FromArgb(40, 40, 40));
+            Color digitColor = ParseColor(config.NumeralsColor, Color.White);
+            Color secColor = ParseColor(config.SecondHandColor, Color.FromArgb(229, 169, 60));
+            Color accentColor = ParseColor(config.AccentCenterColor, Color.FromArgb(45, 45, 45));
+
+            float baseSize = Math.Min(w, h) * scale;
+            float cardH = baseSize * 0.46f;
+            float cardW = cardH * 0.90f;
+            float secCardW = cardW * 0.65f;
+            float secCardH = cardH * 0.65f;
+            float gap = baseSize * 0.035f;
+
+            float totalW = showSec ? (cardW * 2 + secCardW + gap * 2) : (cardW * 2 + gap);
+            float startX = cx - (totalW / 2f);
+            float startY = cy - (cardH / 2f) - (config.ShowDate ? baseSize * 0.05f : 0);
+
+            // 1. Draw Hour Card
+            RectangleF hrRect = new RectangleF(startX, startY, cardW, cardH);
+            DrawDigitalCard(g, hrRect, hrStr, digitColor, cardBgColor, cardBorderColor, isFlip, config.Use24Hour ? null : ampmStr);
+
+            // 2. Draw Minute Card
+            RectangleF minRect = new RectangleF(startX + cardW + gap, startY, cardW, cardH);
+            DrawDigitalCard(g, minRect, minStr, digitColor, cardBgColor, cardBorderColor, isFlip, null);
+
+            // 3. Draw Seconds Card (if enabled)
+            if (showSec)
+            {
+                RectangleF secRect = new RectangleF(startX + cardW * 2 + gap * 2, startY + (cardH - secCardH), secCardW, secCardH);
+                DrawDigitalCard(g, secRect, secStr, secColor, cardBgColor, cardBorderColor, isFlip, null);
+            }
+
+            // 4. Date Badge (if enabled)
+            if (config.ShowDate)
+            {
+                string dateStr = GetFormattedDate(now);
+                float dateFontSize = Math.Max(7f, baseSize * 0.052f);
+
+                using (Font dateFont = new Font("Segoe UI", dateFontSize, FontStyle.Bold))
+                using (Brush dateTextBrush = new SolidBrush(ParseColor(config.DateTextColor, Color.Gray)))
+                using (Brush dateBgBrush = new SolidBrush(ParseColor(config.DateBadgeBgColor, Color.FromArgb(31, 41, 55))))
+                using (Pen dateBorderPen = new Pen(cardBorderColor, 1f))
+                using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+                {
+                    SizeF sz = g.MeasureString(dateStr, dateFont);
+                    float bw = sz.Width + baseSize * 0.08f;
+                    float bh = sz.Height + baseSize * 0.03f;
+                    float bx = cx - bw / 2f;
+                    float by = startY + cardH + baseSize * 0.06f;
+
+                    GraphicsPath path = RoundedRect(new RectangleF(bx, by, bw, bh), Math.Max(3f, baseSize * 0.015f));
+                    g.FillPath(dateBgBrush, path);
+                    g.DrawPath(dateBorderPen, path);
+                    g.DrawString(dateStr, dateFont, dateTextBrush, cx, by + bh / 2f, sf);
+                }
+            }
+        }
+
+        private void DrawDigitalCard(Graphics g, RectangleF rect, string text, Color textColor, Color bgColor, Color borderColor, bool isFlip, string badgeText)
+        {
+            float cornerR = Math.Max(4f, rect.Height * 0.08f);
+
+            if (isFlip)
+            {
+                // Rounded Card Background
+                using (GraphicsPath path = RoundedRect(rect, cornerR))
+                using (Brush bgBrush = new SolidBrush(bgColor))
+                using (Pen borderPen = new Pen(borderColor, Math.Max(1.5f, rect.Height * 0.012f)))
+                {
+                    g.FillPath(bgBrush, path);
+                    if (config.ShowDialBorder)
+                    {
+                        g.DrawPath(borderPen, path);
+                    }
+                }
+
+                // Center Split Line (Fliqlo horizontal crease)
+                float midY = rect.Y + rect.Height / 2f;
+                using (Pen splitPen = new Pen(Color.FromArgb(180, 10, 10, 15), Math.Max(1.5f, rect.Height * 0.012f)))
+                using (Pen highlightPen = new Pen(Color.FromArgb(60, 255, 255, 255), 1f))
+                {
+                    g.DrawLine(splitPen, rect.X, midY, rect.Right, midY);
+                    g.DrawLine(highlightPen, rect.X, midY + 1.5f, rect.Right, midY + 1.5f);
+                }
+
+                // Tiny side hinge notches
+                float notchW = rect.Width * 0.035f;
+                float notchH = rect.Height * 0.04f;
+                using (Brush notchBrush = new SolidBrush(ParseColor(config.BgColor, Color.Black)))
+                {
+                    g.FillRectangle(notchBrush, rect.X - 1, midY - notchH / 2f, notchW, notchH);
+                    g.FillRectangle(notchBrush, rect.Right - notchW + 1, midY - notchH / 2f, notchW, notchH);
+                }
+            }
+
+            // Draw Digits
+            float fontSize = Math.Max(14f, rect.Height * 0.62f);
+            using (Font font = new Font("Segoe UI", fontSize, FontStyle.Bold, GraphicsUnit.Pixel))
+            using (Brush textBrush = new SolidBrush(textColor))
+            using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
+            {
+                g.DrawString(text, font, textBrush, rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f, sf);
+            }
+
+            // Draw AM/PM Badge if applicable
+            if (!string.IsNullOrEmpty(badgeText))
+            {
+                float badgeFontSize = Math.Max(7f, rect.Height * 0.12f);
+                using (Font badgeFont = new Font("Segoe UI", badgeFontSize, FontStyle.Bold))
+                using (Brush badgeBrush = new SolidBrush(textColor))
+                using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near })
+                {
+                    g.DrawString(badgeText, badgeFont, badgeBrush, rect.X + rect.Width * 0.08f, rect.Y + rect.Height * 0.07f, sf);
+                }
+            }
+        }
+
+        private void RenderAnalogClock(Graphics g, int w, int h, int driftX, int driftY, DateTime now)
+        {
             float cx = (w / 2f) + driftX;
             float cy = (h / 2f) + driftY;
             float radius = (Math.Min(w, h) / 2f) * (previewMode ? 0.85f : config.ClockScale);
@@ -896,11 +1130,8 @@ namespace AnalogClockScreensaver
 
                 using (Font font = new Font(fontName, fontSize, (config.NumeralType == "roman" ? FontStyle.Regular : FontStyle.Bold)))
                 using (Brush numBrush = new SolidBrush(numColor))
-                using (StringFormat sf = new StringFormat())
+                using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 {
-                    sf.Alignment = StringAlignment.Center;
-                    sf.LineAlignment = StringAlignment.Center;
-
                     float numDist = radius * 0.73f;
                     for (int idx = 0; idx < 12; idx++)
                     {
@@ -917,17 +1148,14 @@ namespace AnalogClockScreensaver
             if (config.ShowDate)
             {
                 string dateStr = GetFormattedDate(now);
-
                 float dateFontSize = Math.Max(5.5f, radius * 0.058f);
+
                 using (Font dateFont = new Font("Segoe UI", dateFontSize, FontStyle.Bold))
                 using (Brush dateTextBrush = new SolidBrush(ParseColor(config.DateTextColor, Color.Gray)))
                 using (Brush dateBgBrush = new SolidBrush(ParseColor(config.DateBadgeBgColor, Color.FromArgb(31, 41, 55))))
                 using (Pen dateBorderPen = new Pen(borderColor, 1f))
-                using (StringFormat sf = new StringFormat())
+                using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 {
-                    sf.Alignment = StringAlignment.Center;
-                    sf.LineAlignment = StringAlignment.Center;
-
                     SizeF sz = g.MeasureString(dateStr, dateFont);
                     float bw = sz.Width + radius * 0.08f;
                     float bh = sz.Height + radius * 0.03f;
