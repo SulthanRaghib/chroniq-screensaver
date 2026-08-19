@@ -67,10 +67,6 @@ def build() -> None:
 
         shutil.copyfile(exe_file, scr_file)
 
-        # Backwards compatibility copies
-        shutil.copyfile(exe_file, dist_dir / "AnalogClock.exe")
-        shutil.copyfile(exe_file, dist_dir / "AnalogClock.scr")
-
         print("--------------------------------------------------")
         print("[SUCCESS] Chroniq Screensaver Successfully Built!")
         print(f"File Size: {exe_file.stat().st_size / 1024:.1f} KB")
