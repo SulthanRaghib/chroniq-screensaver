@@ -1,3 +1,3 @@
 @echo off
-title Menjalankan Screensaver Jam Analog
-start "" "%~dp0..\dist\AnalogClock.scr" /s
+title Menjalankan Chroniq Screensaver
+start "" "%~dp0..\dist\Chroniq.scr" /s

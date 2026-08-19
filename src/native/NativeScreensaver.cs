@@ -52,9 +52,20 @@ namespace AnalogClockScreensaver
         public static string GetConfigPath()
         {
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string dir = Path.Combine(appData, "AnalogClockScreensaver");
+            string dir = Path.Combine(appData, "ChroniqScreensaver");
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-            return Path.Combine(dir, "clock_config.json");
+            string modernPath = Path.Combine(dir, "chroniq_config.json");
+            
+            // Backwards compatibility fallback if legacy file exists
+            if (!File.Exists(modernPath))
+            {
+                string legacyPath = Path.Combine(appData, "AnalogClockScreensaver", "clock_config.json");
+                if (File.Exists(legacyPath))
+                {
+                    try { File.Copy(legacyPath, modernPath, true); } catch { }
+                }
+            }
+            return modernPath;
         }
 
         public static ClockConfig Load()
@@ -296,7 +307,7 @@ namespace AnalogClockScreensaver
 
         private void InitUI()
         {
-            this.Text = "Pengaturan Screensaver Jam (Analog & Digital)";
+            this.Text = "Chroniq — Pengaturan Screensaver Jam (Analog & Digital)";
             this.Size = new Size(640, 780);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
