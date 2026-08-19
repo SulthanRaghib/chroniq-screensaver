@@ -338,9 +338,8 @@ namespace AnalogClockScreensaver
             btnPreview.Location = new Point(16, 11);
             btnPreview.Cursor = Cursors.Hand;
             btnPreview.Click += (s, e) => {
-                SyncUIToConfig();
-                config.Save();
-                using (ScreenSaverForm previewForm = new ScreenSaverForm(Screen.PrimaryScreen.Bounds))
+                ClockConfig previewConfig = BuildCurrentUIConfig();
+                using (ScreenSaverForm previewForm = new ScreenSaverForm(Screen.PrimaryScreen.Bounds, previewConfig, testPreview: true))
                 {
                     previewForm.ShowDialog();
                 }
@@ -660,48 +659,55 @@ namespace AnalogClockScreensaver
             }
         }
 
-        private void SyncUIToConfig()
+        private ClockConfig BuildCurrentUIConfig()
         {
-            config.ClockMode = rbDigital.Checked ? "digital" : "analog";
-            config.PresetName = cbPreset.SelectedItem != null ? cbPreset.SelectedItem.ToString() : "Custom";
-            config.Style = cbStyle.SelectedItem != null ? cbStyle.SelectedItem.ToString() : "modern";
-            config.NumeralType = cbNumeral.SelectedItem != null ? cbNumeral.SelectedItem.ToString() : "arabic";
+            ClockConfig c = new ClockConfig();
+            c.ClockMode = rbDigital.Checked ? "digital" : "analog";
+            c.PresetName = cbPreset.SelectedItem != null ? cbPreset.SelectedItem.ToString() : "Custom";
+            c.Style = cbStyle.SelectedItem != null ? cbStyle.SelectedItem.ToString() : "modern";
+            c.NumeralType = cbNumeral.SelectedItem != null ? cbNumeral.SelectedItem.ToString() : "arabic";
 
-            config.ShowHourHand = chkHour.Checked;
-            config.ShowMinuteHand = chkMin.Checked;
-            config.ShowSecondHand = chkSec.Checked;
-            config.SmoothSweep = chkSweep.Checked;
-            config.ShowDate = chkDate.Checked;
-            config.ShowDialBorder = chkBorder.Checked;
-            config.AntiBurnIn = chkAntiBurn.Checked;
-            config.ClockScale = tbScale.Value / 100.0f;
+            c.ShowHourHand = chkHour.Checked;
+            c.ShowMinuteHand = chkMin.Checked;
+            c.ShowSecondHand = chkSec.Checked;
+            c.SmoothSweep = chkSweep.Checked;
+            c.ShowDate = chkDate.Checked;
+            c.ShowDialBorder = chkBorder.Checked;
+            c.AntiBurnIn = chkAntiBurn.Checked;
+            c.ClockScale = tbScale.Value / 100.0f;
 
             // Digital sync
-            config.DigitalStyle = (cbDigitalStyle.SelectedIndex == 1) ? "minimal" : "flip";
-            config.Use24Hour = chk24Hour.Checked;
-            config.ShowDigitalSeconds = chkDigitalSec.Checked;
+            c.DigitalStyle = (cbDigitalStyle.SelectedIndex == 1) ? "minimal" : "flip";
+            c.Use24Hour = chk24Hour.Checked;
+            c.ShowDigitalSeconds = chkDigitalSec.Checked;
 
             // Date Lang Sync
             int dIdx = cbDateLang.SelectedIndex;
-            if (dIdx == 1) config.DateFormatLanguage = "id";
-            else if (dIdx == 2) config.DateFormatLanguage = "en";
-            else if (dIdx == 3) config.DateFormatLanguage = "full_id";
-            else if (dIdx == 4) config.DateFormatLanguage = "full_en";
-            else if (dIdx == 5) config.DateFormatLanguage = "numeric";
-            else config.DateFormatLanguage = "system";
+            if (dIdx == 1) c.DateFormatLanguage = "id";
+            else if (dIdx == 2) c.DateFormatLanguage = "en";
+            else if (dIdx == 3) c.DateFormatLanguage = "full_id";
+            else if (dIdx == 4) c.DateFormatLanguage = "full_en";
+            else if (dIdx == 5) c.DateFormatLanguage = "numeric";
+            else c.DateFormatLanguage = "system";
 
-            config.BgColor = btnBg.Text;
-            config.DialColor = btnDial.Text;
-            config.BorderColor = btnBorder.Text;
-            config.HourMarkersColor = btnHourM.Text;
-            config.MinuteMarkersColor = btnMinM.Text;
-            config.NumeralsColor = btnNum.Text;
-            config.HourHandColor = btnHourH.Text;
-            config.MinuteHandColor = btnMinH.Text;
-            config.SecondHandColor = btnSecH.Text;
-            config.AccentCenterColor = btnAccent.Text;
-            config.DateBadgeBgColor = btnDateBg.Text;
-            config.DateTextColor = btnDateText.Text;
+            c.BgColor = btnBg.Text;
+            c.DialColor = btnDial.Text;
+            c.BorderColor = btnBorder.Text;
+            c.HourMarkersColor = btnHourM.Text;
+            c.MinuteMarkersColor = btnMinM.Text;
+            c.NumeralsColor = btnNum.Text;
+            c.HourHandColor = btnHourH.Text;
+            c.MinuteHandColor = btnMinH.Text;
+            c.SecondHandColor = btnSecH.Text;
+            c.AccentCenterColor = btnAccent.Text;
+            c.DateBadgeBgColor = btnDateBg.Text;
+            c.DateTextColor = btnDateText.Text;
+            return c;
+        }
+
+        private void SyncUIToConfig()
+        {
+            this.config = BuildCurrentUIConfig();
         }
 
         private void SaveAndClose()
@@ -729,6 +735,7 @@ namespace AnalogClockScreensaver
 
         private Point mouseLocation;
         private bool previewMode = false;
+        private bool isTestPreview = false;
         private IntPtr previewParentHwnd = IntPtr.Zero;
         private ClockConfig config;
         private Timer timer;
@@ -751,9 +758,10 @@ namespace AnalogClockScreensaver
             return fallback;
         }
 
-        public ScreenSaverForm(Rectangle bounds)
+        public ScreenSaverForm(Rectangle bounds, ClockConfig customConfig = null, bool testPreview = false)
         {
-            config = ClockConfig.Load();
+            this.isTestPreview = testPreview;
+            config = customConfig != null ? customConfig : ClockConfig.Load();
             startTime = DateTime.Now;
 
             this.BackColor = ParseColor(config.BgColor, Color.FromArgb(11, 15, 25));
@@ -1312,7 +1320,15 @@ namespace AnalogClockScreensaver
                 if (timer != null) timer.Stop();
             }
             catch { }
-            Environment.Exit(0);
+
+            if (isTestPreview)
+            {
+                this.Close(); // Only close modal preview window and return to SettingsForm!
+            }
+            else
+            {
+                Environment.Exit(0); // Exit standalone screensaver process
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
