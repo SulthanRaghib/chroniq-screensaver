@@ -87,9 +87,18 @@ namespace AnalogClockScreensaver
         {
             try
             {
-                string path = GetConfigPath();
                 string json = ToJson();
-                File.WriteAllText(path, json);
+                string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+                // 1. Modern Chroniq path
+                string dir1 = Path.Combine(appData, "ChroniqScreensaver");
+                if (!Directory.Exists(dir1)) Directory.CreateDirectory(dir1);
+                File.WriteAllText(Path.Combine(dir1, "chroniq_config.json"), json);
+
+                // 2. Legacy compatibility path
+                string dir2 = Path.Combine(appData, "AnalogClockScreensaver");
+                if (!Directory.Exists(dir2)) Directory.CreateDirectory(dir2);
+                File.WriteAllText(Path.Combine(dir2, "clock_config.json"), json);
             }
             catch { }
         }
@@ -792,12 +801,22 @@ namespace AnalogClockScreensaver
             SetupTimer();
         }
 
+        private DateTime lastConfigCheck = DateTime.MinValue;
+        private DateTime lastConfigWriteTime = DateTime.MinValue;
+
         public ScreenSaverForm(IntPtr previewHandle)
         {
             previewMode = true;
             previewParentHwnd = previewHandle;
             config = ClockConfig.Load();
             startTime = DateTime.Now;
+
+            try
+            {
+                string path = ClockConfig.GetConfigPath();
+                if (File.Exists(path)) lastConfigWriteTime = File.GetLastWriteTimeUtc(path);
+            }
+            catch { }
 
             this.BackColor = ParseColor(config.BgColor, Color.FromArgb(11, 15, 25));
             this.FormBorderStyle = FormBorderStyle.None;
@@ -812,7 +831,7 @@ namespace AnalogClockScreensaver
             this.Bounds = new Rectangle(0, 0, parentRect.Width, parentRect.Height);
             SetWindowPos(this.Handle, IntPtr.Zero, 0, 0, parentRect.Width, parentRect.Height, 0x0040); // SWP_SHOWWINDOW
 
-            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.ResizeRedraw, true);
+            this.SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint | ControlStyles.OptimizedDoubleBuffer | ControlStyles.Opaque, true);
             this.UpdateStyles();
 
             SetupTimer();
@@ -821,9 +840,39 @@ namespace AnalogClockScreensaver
         private void SetupTimer()
         {
             timer = new Timer();
-            timer.Interval = (config.ClockMode == "analog" && config.SmoothSweep) ? 16 : 50; // ~60 FPS or smooth 20 FPS
-            timer.Tick += (s, e) => this.Invalidate();
+            timer.Interval = previewMode ? 40 : ((config.ClockMode == "analog" && config.SmoothSweep) ? 16 : 40);
+            timer.Tick += (s, e) => {
+                if (previewMode)
+                {
+                    // Check for config updates every 500ms
+                    if ((DateTime.Now - lastConfigCheck).TotalMilliseconds > 500)
+                    {
+                        lastConfigCheck = DateTime.Now;
+                        try
+                        {
+                            string path = ClockConfig.GetConfigPath();
+                            if (File.Exists(path))
+                            {
+                                DateTime wt = File.GetLastWriteTimeUtc(path);
+                                if (wt > lastConfigWriteTime)
+                                {
+                                    lastConfigWriteTime = wt;
+                                    this.config = ClockConfig.Load();
+                                    this.BackColor = ParseColor(config.BgColor, Color.FromArgb(11, 15, 25));
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                }
+                this.Invalidate();
+            };
             timer.Start();
+        }
+
+        protected override void OnPaintBackground(PaintEventArgs e)
+        {
+            // Do not paint background to prevent flicker
         }
 
         private string GetFormattedDate(DateTime now)
@@ -896,21 +945,6 @@ namespace AnalogClockScreensaver
             DateTime now = DateTime.Now;
             int w = this.ClientSize.Width;
             int h = this.ClientSize.Height;
-
-            if (previewMode && previewParentHwnd != IntPtr.Zero)
-            {
-                Rectangle parentRect;
-                if (GetClientRect(previewParentHwnd, out parentRect) && parentRect.Width > 0 && parentRect.Height > 0)
-                {
-                    if (this.Width != parentRect.Width || this.Height != parentRect.Height)
-                    {
-                        this.Bounds = new Rectangle(0, 0, parentRect.Width, parentRect.Height);
-                        SetWindowPos(this.Handle, IntPtr.Zero, 0, 0, parentRect.Width, parentRect.Height, 0x0040);
-                    }
-                    w = parentRect.Width;
-                    h = parentRect.Height;
-                }
-            }
 
             if (w <= 0 || h <= 0) return;
 
