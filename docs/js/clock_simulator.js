@@ -41,6 +41,13 @@ class ClockSimulator {
     this.startTime = Date.now();
     this.animationFrameId = null;
 
+    // 3D Split-Flap animation states (Fliqlo mechanical fold)
+    this.flipStates = {
+      hour: { prev: null, curr: null, start: 0, dur: 450 },
+      min:  { prev: null, curr: null, start: 0, dur: 450 },
+      sec:  { prev: null, curr: null, start: 0, dur: 380 }
+    };
+
     this.initPresets();
     this.setupResize();
     this.start();
@@ -191,15 +198,15 @@ class ClockSimulator {
     const startX = cx - totalW / 2;
     const startY = cy - cardH / 2 - (this.config.showDate ? baseSize * 0.04 : 0);
 
-    // 1. Hour Card
-    this.drawDigitalCard(startX, startY, cardW, cardH, hrStr, this.config.colors.numerals, use24 ? null : ampmStr);
+    // 1. Hour Flip Card
+    this.drawFlipCard(startX, startY, cardW, cardH, 'hour', hrStr, this.config.colors.numerals, use24 ? null : ampmStr);
 
-    // 2. Minute Card
-    this.drawDigitalCard(startX + cardW + gap, startY, cardW, cardH, minStr, this.config.colors.numerals, null);
+    // 2. Minute Flip Card
+    this.drawFlipCard(startX + cardW + gap, startY, cardW, cardH, 'min', minStr, this.config.colors.numerals, null);
 
-    // 3. Second Card
+    // 3. Second Flip Card
     if (showSec) {
-      this.drawDigitalCard(startX + cardW * 2 + gap * 2, startY + (cardH - secCardH), secCardW, secCardH, secStr, this.config.colors.secHand, null);
+      this.drawFlipCard(startX + cardW * 2 + gap * 2, startY + (cardH - secCardH), secCardW, secCardH, 'sec', secStr, this.config.colors.secHand, null);
     }
 
     // 4. Date Badge
@@ -229,31 +236,145 @@ class ClockSimulator {
     }
   }
 
-  drawDigitalCard(x, y, w, h, text, textColor, badgeText) {
+  drawFlipCard(x, y, w, h, key, newText, textColor, badgeText) {
+    const state = this.flipStates[key];
+    const nowMs = performance.now();
+
+    if (state.curr !== newText) {
+      if (state.curr !== null) {
+        state.prev = state.curr;
+        state.start = nowMs;
+      } else {
+        state.prev = newText;
+      }
+      state.curr = newText;
+    }
+
+    const elapsed = nowMs - state.start;
+    const duration = state.dur || 420;
+    const progress = Math.min(1.0, elapsed / duration);
+
+    if (progress >= 1.0 || state.prev === state.curr) {
+      // Static Card (no flip active)
+      this.drawHalfCard(x, y, w, h, state.curr, textColor, badgeText, true, 1.0, 0);
+      this.drawHalfCard(x, y, w, h, state.curr, textColor, null, false, 1.0, 0);
+    } else {
+      // Smooth 3D mechanical flip easing
+      const p = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+
+      if (p <= 0.5) {
+        const scaleY = Math.cos(p * Math.PI);
+        const shadow = p * 1.1;
+
+        // 1. Static Bottom (shows previous number with shadow darkening)
+        this.drawHalfCard(x, y, w, h, state.prev, textColor, null, false, 1.0, p * 0.45);
+
+        // 2. Static Top Behind (reveals next number)
+        this.drawHalfCard(x, y, w, h, state.curr, textColor, badgeText, true, 1.0, 0);
+
+        // 3. Flipping Top Flap (folds down showing previous number)
+        this.drawHalfCard(x, y, w, h, state.prev, textColor, badgeText, true, scaleY, shadow);
+      } else {
+        const scaleY = -Math.cos(p * Math.PI);
+        const shadow = (1.0 - p) * 1.1;
+
+        // 1. Static Bottom Behind (shows previous number)
+        this.drawHalfCard(x, y, w, h, state.prev, textColor, null, false, 1.0, 0);
+
+        // 2. Static Top (shows next number)
+        this.drawHalfCard(x, y, w, h, state.curr, textColor, badgeText, true, 1.0, 0);
+
+        // 3. Flipping Bottom Flap (drops down showing next number)
+        this.drawHalfCard(x, y, w, h, state.curr, textColor, null, false, scaleY, shadow);
+      }
+    }
+
+    // Crease line & side hinges
+    this.drawCreaseAndHinges(x, y, w, h);
+  }
+
+  drawHalfCard(x, y, w, h, text, textColor, badgeText, isTop, scaleY = 1.0, shadowAlpha = 0.0) {
     const ctx = this.ctx;
     const cornerR = Math.max(6, h * 0.09);
+    const midY = y + h / 2;
+    const cx = x + w / 2;
+    const cy = y + h / 2;
 
-    // Card background
+    ctx.save();
+
+    if (scaleY < 0.999) {
+      ctx.translate(cx, midY);
+      ctx.scale(1, Math.max(0.001, scaleY));
+      ctx.translate(-cx, -midY);
+    }
+
+    // Clip to half card
+    if (isTop) {
+      this.roundTopHalf(x, y, w, h, cornerR);
+    } else {
+      this.roundBottomHalf(x, y, w, h, cornerR);
+    }
+    ctx.clip();
+
+    // Fill background
     ctx.fillStyle = this.config.colors.dial;
-    this.roundRect(x, y, w, h, cornerR, true, false);
+    if (isTop) {
+      this.roundTopHalf(x, y, w, h, cornerR);
+    } else {
+      this.roundBottomHalf(x, y, w, h, cornerR);
+    }
+    ctx.fill();
 
     // Border
     if (this.config.showBorder) {
       ctx.strokeStyle = this.config.colors.border;
       ctx.lineWidth = Math.max(1.2, h * 0.014);
-      this.roundRect(x, y, w, h, cornerR, false, true);
+      ctx.stroke();
     }
 
-    // Flip center crease / split line
+    // Digits
+    const fontSize = Math.max(16, h * 0.54);
+    ctx.font = `bold ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
+    ctx.fillStyle = textColor;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, cx, cy);
+
+    // AM/PM badge (only on top half)
+    if (isTop && badgeText) {
+      const badgeFontSize = Math.max(9, h * 0.12);
+      ctx.font = `bold ${badgeFontSize}px 'Plus Jakarta Sans', sans-serif`;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      ctx.fillText(badgeText, x + w * 0.09, y + h * 0.08);
+    }
+
+    // 3D Shadow shading overlay
+    if (shadowAlpha > 0.01) {
+      ctx.fillStyle = `rgba(0, 0, 0, ${Math.min(0.85, shadowAlpha)})`;
+      if (isTop) {
+        ctx.fillRect(x - 2, y - 2, w + 4, h / 2 + 4);
+      } else {
+        ctx.fillRect(x - 2, midY - 2, w + 4, h / 2 + 4);
+      }
+    }
+
+    ctx.restore();
+  }
+
+  drawCreaseAndHinges(x, y, w, h) {
+    const ctx = this.ctx;
     const midY = y + h / 2;
-    ctx.strokeStyle = 'rgba(0, 0, 0, 0.45)';
+
+    // Flip center crease / split line
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.55)';
     ctx.lineWidth = Math.max(1.5, h * 0.018);
     ctx.beginPath();
     ctx.moveTo(x, midY);
     ctx.lineTo(x + w, midY);
     ctx.stroke();
 
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.09)';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(x, midY + 1.2);
@@ -266,23 +387,34 @@ class ClockSimulator {
     ctx.fillStyle = this.config.colors.bg;
     ctx.fillRect(x - 1, midY - notchH / 2, notchW, notchH);
     ctx.fillRect(x + w - notchW + 1, midY - notchH / 2, notchW, notchH);
+  }
 
-    // Digits with comfortable internal padding
-    const fontSize = Math.max(16, h * 0.54);
-    ctx.font = `bold ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
-    ctx.fillStyle = textColor;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(text, x + w / 2, y + h / 2);
+  roundTopHalf(x, y, w, h, r) {
+    const midY = y + h / 2;
+    const ctx = this.ctx;
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, midY);
+    ctx.lineTo(x, midY);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
 
-    // AM/PM badge
-    if (badgeText) {
-      const badgeFontSize = Math.max(9, h * 0.12);
-      ctx.font = `bold ${badgeFontSize}px 'Plus Jakarta Sans', sans-serif`;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText(badgeText, x + w * 0.09, y + h * 0.08);
-    }
+  roundBottomHalf(x, y, w, h, r) {
+    const midY = y + h / 2;
+    const ctx = this.ctx;
+    ctx.beginPath();
+    ctx.moveTo(x, midY);
+    ctx.lineTo(x + w, midY);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, midY);
+    ctx.closePath();
   }
 
   renderAnalog(now, w, h) {

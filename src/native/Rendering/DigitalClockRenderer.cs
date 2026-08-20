@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using Chroniq.Models;
@@ -7,17 +8,31 @@ namespace Chroniq.Rendering
 {
     /// <summary>
     /// Vector GDI+ rendering engine for Retro-Modern Digital Flip Clocks (Fliqlo aesthetic).
-    /// Handles wide flip cards, crisp creases, generous gaps, side hinges, AM/PM indicators, and date badges.
+    /// Features true 3D mechanical split-flap folding animations on second, minute, and hour transitions,
+    /// dynamic lighting shadows, center crease lines, side hinges, and date badges.
     /// </summary>
     public static class DigitalClockRenderer
     {
+        private class CardFlipState
+        {
+            public string Prev = null;
+            public string Curr = null;
+            public long StartMs = 0;
+            public int DurationMs = 420;
+        }
+
+        private static readonly Stopwatch _sw = Stopwatch.StartNew();
+        private static readonly CardFlipState _hourState = new CardFlipState { DurationMs = 450 };
+        private static readonly CardFlipState _minState = new CardFlipState { DurationMs = 450 };
+        private static readonly CardFlipState _secState = new CardFlipState { DurationMs = 380 };
+
         public static void Render(Graphics g, ClockConfig config, int w, int h, int driftX, int driftY, DateTime now, bool previewMode)
         {
             float scale = previewMode ? 0.72f : config.ClockScale;
             float cx = (w / 2f) + driftX;
             float cy = (h / 2f) + driftY;
 
-            // Compute hour and minute strings
+            // Compute hour, minute, and second strings
             int hourVal = config.Use24Hour ? now.Hour : (now.Hour % 12 == 0 ? 12 : now.Hour % 12);
             string hrStr = hourVal.ToString("00");
             string minStr = now.Minute.ToString("00");
@@ -46,17 +61,17 @@ namespace Chroniq.Rendering
 
             // 1. Draw Hour Card
             RectangleF hrRect = new RectangleF(startX, startY, cardW, cardH);
-            DrawDigitalCard(g, hrRect, hrStr, digitColor, cardBgColor, cardBorderColor, isFlip, config.Use24Hour ? null : ampmStr, previewMode);
+            DrawFlipCard(g, hrRect, _hourState, hrStr, digitColor, cardBgColor, cardBorderColor, isFlip, config.Use24Hour ? null : ampmStr, previewMode);
 
             // 2. Draw Minute Card
             RectangleF minRect = new RectangleF(startX + cardW + gap, startY, cardW, cardH);
-            DrawDigitalCard(g, minRect, minStr, digitColor, cardBgColor, cardBorderColor, isFlip, null, previewMode);
+            DrawFlipCard(g, minRect, _minState, minStr, digitColor, cardBgColor, cardBorderColor, isFlip, null, previewMode);
 
             // 3. Draw Seconds Card (if enabled)
             if (showSec)
             {
                 RectangleF secRect = new RectangleF(startX + cardW * 2f + gap * 2f, startY + (cardH - secCardH), secCardW, secCardH);
-                DrawDigitalCard(g, secRect, secStr, secColor, cardBgColor, cardBorderColor, isFlip, null, previewMode);
+                DrawFlipCard(g, secRect, _secState, secStr, secColor, cardBgColor, cardBorderColor, isFlip, null, previewMode);
             }
 
             // 4. Date Badge (if enabled)
@@ -85,71 +100,194 @@ namespace Chroniq.Rendering
             }
         }
 
-        private static void DrawDigitalCard(Graphics g, RectangleF rect, string text, Color textColor, Color bgColor, Color borderColor, bool isFlip, string badgeText, bool previewMode)
+        private static void DrawFlipCard(Graphics g, RectangleF rect, CardFlipState state, string newText, Color textColor, Color bgColor, Color borderColor, bool isFlip, string badgeText, bool previewMode)
         {
-            float cornerR = Math.Max(4f, rect.Height * 0.09f);
+            long nowMs = _sw.ElapsedMilliseconds;
 
-            if (isFlip)
+            if (state.Curr != newText)
             {
-                // Rounded Card Background
-                using (GraphicsPath path = ColorHelper.RoundedRect(rect, cornerR))
-                using (Brush bgBrush = new SolidBrush(bgColor))
-                using (Pen borderPen = new Pen(borderColor, Math.Max(1.2f, rect.Height * 0.014f)))
+                if (state.Curr != null)
                 {
-                    g.FillPath(bgBrush, path);
-                    g.DrawPath(borderPen, path);
+                    state.Prev = state.Curr;
+                    state.StartMs = nowMs;
                 }
+                else
+                {
+                    state.Prev = newText;
+                }
+                state.Curr = newText;
+            }
 
-                // Center Flip Crease / Divider Line
-                float midY = rect.Y + (rect.Height / 2f);
-                using (Pen darkPen = new Pen(Color.FromArgb(140, 0, 0, 0), Math.Max(1.5f, rect.Height * 0.018f)))
-                using (Pen lightPen = new Pen(Color.FromArgb(40, 255, 255, 255), 1f))
-                {
-                    g.DrawLine(darkPen, rect.X + 2, midY, rect.Right - 2, midY);
-                    g.DrawLine(lightPen, rect.X + 2, midY + 1.2f, rect.Right - 2, midY + 1.2f);
-                }
+            long elapsed = nowMs - state.StartMs;
+            float progress = state.DurationMs > 0 ? (float)elapsed / state.DurationMs : 1f;
+            if (progress > 1f) progress = 1f;
 
-                // Side Hinge Notches
-                float notchW = rect.Width * 0.035f;
-                float notchH = rect.Height * 0.050f;
-                using (Brush notchBrush = new SolidBrush(Color.FromArgb(11, 15, 25)))
-                {
-                    g.FillRectangle(notchBrush, rect.X - 1, midY - notchH / 2f, notchW, notchH);
-                    g.FillRectangle(notchBrush, rect.Right - notchW + 1, midY - notchH / 2f, notchW, notchH);
-                }
+            if (!isFlip || progress >= 1f || state.Prev == state.Curr)
+            {
+                // Static Card
+                DrawHalfCard(g, rect, state.Curr, textColor, bgColor, borderColor, badgeText, true, 1f, 0f, isFlip, previewMode);
+                DrawHalfCard(g, rect, state.Curr, textColor, bgColor, borderColor, null, false, 1f, 0f, isFlip, previewMode);
             }
             else
             {
-                // Clean Minimalist Style with translucent card backing and subtle border
-                using (GraphicsPath path = ColorHelper.RoundedRect(rect, cornerR))
-                using (Brush bgBrush = new SolidBrush(Color.FromArgb(40, bgColor)))
-                using (Pen borderPen = new Pen(Color.FromArgb(60, borderColor), 1f))
+                // 3D Mechanical Flip Transition
+                float p = EaseFlip(progress);
+
+                if (p <= 0.5f)
+                {
+                    float scaleY = (float)Math.Cos(p * Math.PI);
+                    float shadow = p * 1.1f;
+
+                    // 1. Static Bottom (shows previous number with shadow darkening)
+                    DrawHalfCard(g, rect, state.Prev, textColor, bgColor, borderColor, null, false, 1f, p * 0.45f, isFlip, previewMode);
+
+                    // 2. Static Top Behind (reveals next number)
+                    DrawHalfCard(g, rect, state.Curr, textColor, bgColor, borderColor, badgeText, true, 1f, 0f, isFlip, previewMode);
+
+                    // 3. Flipping Top Flap (folds down showing previous number)
+                    DrawHalfCard(g, rect, state.Prev, textColor, bgColor, borderColor, badgeText, true, scaleY, shadow, isFlip, previewMode);
+                }
+                else
+                {
+                    float scaleY = -(float)Math.Cos(p * Math.PI);
+                    float shadow = (1f - p) * 1.1f;
+
+                    // 1. Static Bottom Behind (shows previous number)
+                    DrawHalfCard(g, rect, state.Prev, textColor, bgColor, borderColor, null, false, 1f, 0f, isFlip, previewMode);
+
+                    // 2. Static Top (shows next number)
+                    DrawHalfCard(g, rect, state.Curr, textColor, bgColor, borderColor, badgeText, true, 1f, 0f, isFlip, previewMode);
+
+                    // 3. Flipping Bottom Flap (drops down showing next number)
+                    DrawHalfCard(g, rect, state.Curr, textColor, bgColor, borderColor, null, false, scaleY, shadow, isFlip, previewMode);
+                }
+            }
+
+            if (isFlip)
+            {
+                DrawCreaseAndHinges(g, rect);
+            }
+        }
+
+        private static void DrawHalfCard(Graphics g, RectangleF rect, string text, Color textColor, Color bgColor, Color borderColor, string badgeText, bool isTop, float scaleY, float shadowAlpha, bool isFlip, bool previewMode)
+        {
+            float cornerR = Math.Max(4f, rect.Height * 0.09f);
+            float midY = rect.Y + (rect.Height / 2f);
+            float cx = rect.X + (rect.Width / 2f);
+
+            GraphicsState state = g.Save();
+
+            if (scaleY < 0.999f)
+            {
+                Matrix m = g.Transform;
+                m.Translate(cx, midY);
+                m.Scale(1f, Math.Max(0.001f, scaleY));
+                m.Translate(-cx, -midY);
+                g.Transform = m;
+            }
+
+            using (GraphicsPath path = isTop ? RoundedTopHalf(rect, cornerR) : RoundedBottomHalf(rect, cornerR))
+            {
+                g.SetClip(path);
+
+                // Fill card background
+                using (Brush bgBrush = new SolidBrush(isFlip ? bgColor : Color.FromArgb(40, bgColor)))
                 {
                     g.FillPath(bgBrush, path);
+                }
+
+                // Draw border
+                using (Pen borderPen = new Pen(isFlip ? borderColor : Color.FromArgb(60, borderColor), Math.Max(1.2f, rect.Height * 0.014f)))
+                {
                     g.DrawPath(borderPen, path);
                 }
-            }
 
-            // Draw Digits with optimal internal padding
-            float fontSize = Math.Max(8f, rect.Height * (previewMode ? 0.52f : 0.54f));
-            using (Font font = new Font("Segoe UI", fontSize, FontStyle.Bold))
-            using (Brush textBrush = new SolidBrush(textColor))
-            using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
-            {
-                g.DrawString(text, font, textBrush, rect.X + rect.Width / 2f, rect.Y + rect.Height / 2f, sf);
-            }
-
-            // Draw AM/PM Badge if applicable
-            if (!string.IsNullOrEmpty(badgeText))
-            {
-                float badgeFontSize = Math.Max(5f, rect.Height * (previewMode ? 0.10f : 0.12f));
-                using (Font badgeFont = new Font("Segoe UI", badgeFontSize, FontStyle.Bold))
-                using (Brush badgeBrush = new SolidBrush(textColor))
-                using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near })
+                // Draw digits
+                float fontSize = Math.Max(8f, rect.Height * (previewMode ? 0.52f : 0.54f));
+                using (Font font = new Font("Segoe UI", fontSize, FontStyle.Bold))
+                using (Brush textBrush = new SolidBrush(textColor))
+                using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 {
-                    g.DrawString(badgeText, badgeFont, badgeBrush, rect.X + rect.Width * 0.08f, rect.Y + rect.Height * 0.07f, sf);
+                    g.DrawString(text, font, textBrush, cx, rect.Y + rect.Height / 2f, sf);
+                }
+
+                // Draw badge if applicable (top half only)
+                if (isTop && !string.IsNullOrEmpty(badgeText))
+                {
+                    float badgeFontSize = Math.Max(5f, rect.Height * (previewMode ? 0.10f : 0.12f));
+                    using (Font badgeFont = new Font("Segoe UI", badgeFontSize, FontStyle.Bold))
+                    using (Brush badgeBrush = new SolidBrush(textColor))
+                    using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near })
+                    {
+                        g.DrawString(badgeText, badgeFont, badgeBrush, rect.X + rect.Width * 0.08f, rect.Y + rect.Height * 0.07f, sf);
+                    }
+                }
+
+                // 3D Shadow shading overlay
+                if (shadowAlpha > 0.01f)
+                {
+                    int alpha = (int)Math.Min(215, shadowAlpha * 255);
+                    using (Brush shadowBrush = new SolidBrush(Color.FromArgb(alpha, 0, 0, 0)))
+                    {
+                        g.FillPath(shadowBrush, path);
+                    }
                 }
             }
+
+            g.Restore(state);
+        }
+
+        private static void DrawCreaseAndHinges(Graphics g, RectangleF rect)
+        {
+            float midY = rect.Y + (rect.Height / 2f);
+
+            // Center Flip Crease / Divider Line
+            using (Pen darkPen = new Pen(Color.FromArgb(160, 0, 0, 0), Math.Max(1.5f, rect.Height * 0.018f)))
+            using (Pen lightPen = new Pen(Color.FromArgb(45, 255, 255, 255), 1f))
+            {
+                g.DrawLine(darkPen, rect.X + 2, midY, rect.Right - 2, midY);
+                g.DrawLine(lightPen, rect.X + 2, midY + 1.2f, rect.Right - 2, midY + 1.2f);
+            }
+
+            // Side Hinge Notches
+            float notchW = rect.Width * 0.035f;
+            float notchH = rect.Height * 0.050f;
+            using (Brush notchBrush = new SolidBrush(Color.FromArgb(11, 15, 25)))
+            {
+                g.FillRectangle(notchBrush, rect.X - 1, midY - notchH / 2f, notchW, notchH);
+                g.FillRectangle(notchBrush, rect.Right - notchW + 1, midY - notchH / 2f, notchW, notchH);
+            }
+        }
+
+        private static GraphicsPath RoundedTopHalf(RectangleF rect, float r)
+        {
+            float midY = rect.Y + (rect.Height / 2f);
+            GraphicsPath path = new GraphicsPath();
+            path.AddArc(rect.X, rect.Y, r * 2f, r * 2f, 180, 90);
+            path.AddArc(rect.Right - r * 2f, rect.Y, r * 2f, r * 2f, 270, 90);
+            path.AddLine(rect.Right, rect.Y + r, rect.Right, midY);
+            path.AddLine(rect.Right, midY, rect.X, midY);
+            path.AddLine(rect.X, midY, rect.X, rect.Y + r);
+            path.CloseFigure();
+            return path;
+        }
+
+        private static GraphicsPath RoundedBottomHalf(RectangleF rect, float r)
+        {
+            float midY = rect.Y + (rect.Height / 2f);
+            GraphicsPath path = new GraphicsPath();
+            path.AddLine(rect.X, midY, rect.Right, midY);
+            path.AddLine(rect.Right, midY, rect.Right, rect.Bottom - r);
+            path.AddArc(rect.Right - r * 2f, rect.Bottom - r * 2f, r * 2f, r * 2f, 0, 90);
+            path.AddArc(rect.X, rect.Bottom - r * 2f, r * 2f, r * 2f, 90, 90);
+            path.AddLine(rect.X, rect.Bottom - r, rect.X, midY);
+            path.CloseFigure();
+            return path;
+        }
+
+        private static float EaseFlip(float t)
+        {
+            return t < 0.5f ? 2f * t * t : 1f - (float)Math.Pow(-2f * t + 2f, 2) / 2f;
         }
     }
 }
