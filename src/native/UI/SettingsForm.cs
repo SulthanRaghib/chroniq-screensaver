@@ -97,8 +97,8 @@ namespace Chroniq.UI
             btnPreview.ForeColor = Color.White;
             btnPreview.FlatStyle = FlatStyle.Flat;
             btnPreview.FlatAppearance.BorderSize = 0;
-            btnPreview.Size = new Size(120, 38);
-            btnPreview.Location = new Point(14, 11);
+            btnPreview.Size = new Size(130, 38);
+            btnPreview.Location = new Point(16, 11);
             btnPreview.Cursor = Cursors.Hand;
             btnPreview.Click += (s, e) => {
                 ClockConfig previewConfig = BuildCurrentUIConfig();
@@ -109,48 +109,35 @@ namespace Chroniq.UI
                 Cursor.Show();
             };
 
-            Button btnInstall = new Button();
-            btnInstall.Text = "💾 Pasang ke Windows";
-            btnInstall.Font = new Font("Segoe UI", 8.5F, FontStyle.Bold);
-            btnInstall.BackColor = Color.FromArgb(139, 92, 246);
-            btnInstall.ForeColor = Color.White;
-            btnInstall.FlatStyle = FlatStyle.Flat;
-            btnInstall.FlatAppearance.BorderSize = 0;
-            btnInstall.Size = new Size(155, 38);
-            btnInstall.Location = new Point(142, 11);
-            btnInstall.Cursor = Cursors.Hand;
-            btnInstall.Click += (s, e) => {
-                SaveAndClose(suppressMsg: true);
-                InstallerHelper.InstallToWindows(showSuccessMessage: true);
-            };
+            Button btnCancel = new Button();
+            btnCancel.Text = "Batal";
+            btnCancel.Font = new Font("Segoe UI", 9F);
+            btnCancel.BackColor = Color.FromArgb(148, 163, 184);
+            btnCancel.ForeColor = Color.White;
+            btnCancel.FlatStyle = FlatStyle.Flat;
+            btnCancel.FlatAppearance.BorderSize = 0;
+            btnCancel.Size = new Size(85, 38);
+            btnCancel.Location = new Point(365, 11);
+            btnCancel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnCancel.Cursor = Cursors.Hand;
+            btnCancel.Click += (s, e) => this.Close();
 
             Button btnSave = new Button();
-            btnSave.Text = "Simpan & Terapkan";
+            btnSave.Text = "💾 Simpan & Terapkan";
             btnSave.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnSave.BackColor = Color.FromArgb(16, 185, 129);
             btnSave.ForeColor = Color.White;
             btnSave.FlatStyle = FlatStyle.Flat;
             btnSave.FlatAppearance.BorderSize = 0;
-            btnSave.Size = new Size(150, 38);
-            btnSave.Location = new Point(475, 11);
+            btnSave.Size = new Size(170, 38);
+            btnSave.Location = new Point(460, 11);
+            btnSave.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnSave.Cursor = Cursors.Hand;
             btnSave.Click += (s, e) => SaveAndClose();
 
-            Button btnCancel = new Button();
-            btnCancel.Text = "Batal";
-            btnCancel.BackColor = Color.FromArgb(148, 163, 184);
-            btnCancel.ForeColor = Color.White;
-            btnCancel.FlatStyle = FlatStyle.Flat;
-            btnCancel.FlatAppearance.BorderSize = 0;
-            btnCancel.Size = new Size(75, 38);
-            btnCancel.Location = new Point(390, 11);
-            btnCancel.Cursor = Cursors.Hand;
-            btnCancel.Click += (s, e) => this.Close();
-
             bottomPanel.Controls.Add(btnPreview);
-            bottomPanel.Controls.Add(btnInstall);
-            bottomPanel.Controls.Add(btnSave);
             bottomPanel.Controls.Add(btnCancel);
+            bottomPanel.Controls.Add(btnSave);
 
             this.Controls.Add(tabs);
             this.Controls.Add(bottomPanel);
