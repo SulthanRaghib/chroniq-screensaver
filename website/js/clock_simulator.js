@@ -332,28 +332,30 @@ class ClockSimulator {
       ctx.stroke();
     }
 
-    // Digits
-    const fontSize = Math.max(16, h * 0.51);
+    // Digits (dynamically offset slightly right when AM/PM badge is present to ensure 100% clean clearance)
+    const hasBadge = isTop && !!badgeText;
+    const textCenterX = hasBadge ? (cx + w * 0.05) : cx;
+    const fontSize = Math.max(16, h * (hasBadge ? 0.46 : 0.52));
     ctx.font = `bold ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
     ctx.fillStyle = textColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, cx, cy);
+    ctx.fillText(text, textCenterX, cy);
 
-    // AM/PM badge (top-left indicator pill, 100% clear from digits)
-    if (isTop && badgeText) {
-      const badgeFontSize = Math.max(8, h * 0.078);
+    // AM/PM badge (top-left indicator pill, 100% isolated and separated from hour digits)
+    if (hasBadge) {
+      const badgeFontSize = Math.max(7, h * 0.072);
       ctx.font = `bold ${badgeFontSize}px 'Plus Jakarta Sans', sans-serif`;
       const textMetrics = ctx.measureText(badgeText);
       const px = x + w * 0.055;
-      const py = y + h * 0.055;
-      const pw = textMetrics.width + w * 0.035;
+      const py = y + h * 0.060;
+      const pw = textMetrics.width + w * 0.025;
       const ph = badgeFontSize * 1.5;
 
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.40)';
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';
       this.roundRect(px, py, pw, ph, Math.max(2, h * 0.015), true, false);
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.90)';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(badgeText, px + pw / 2, py + ph / 2);
