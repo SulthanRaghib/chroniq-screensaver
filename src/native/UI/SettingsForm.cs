@@ -61,13 +61,18 @@ namespace Chroniq.UI
         {
             // Window sizing adaptive to display resolution and DPI scaling
             Rectangle workArea = Screen.PrimaryScreen.WorkingArea;
-            int formW = Math.Min(660, workArea.Width - 30);
-            int formH = Math.Min(680, workArea.Height - 50);
+            int formW = Math.Min(680, workArea.Width - 30);
+            int formH = Math.Min(660, workArea.Height - 60);
             this.Size = new Size(formW, formH);
+            this.StartPosition = FormStartPosition.Manual;
+            this.Location = new Point(
+                Math.Max(workArea.Left + 10, workArea.Left + (workArea.Width - formW) / 2),
+                Math.Max(workArea.Top + 30, workArea.Top + (workArea.Height - formH) / 2)
+            );
+            this.Text = "Chroniq — Pengaturan Screensaver Jam (Analog & Digital)";
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.StartPosition = FormStartPosition.CenterScreen;
             this.BackColor = Color.FromArgb(243, 244, 246);
             this.Font = new Font("Segoe UI", 9F, FontStyle.Regular);
 
@@ -90,7 +95,7 @@ namespace Chroniq.UI
             // Bottom Panel for Action Buttons (Always pinned and visible)
             Panel bottomPanel = new Panel();
             bottomPanel.Dock = DockStyle.Bottom;
-            bottomPanel.Height = 60;
+            bottomPanel.Height = 64;
             bottomPanel.BackColor = Color.FromArgb(226, 232, 240);
 
             Button btnPreview = new Button();
@@ -100,7 +105,8 @@ namespace Chroniq.UI
             btnPreview.ForeColor = Color.White;
             btnPreview.FlatStyle = FlatStyle.Flat;
             btnPreview.FlatAppearance.BorderSize = 0;
-            btnPreview.Size = new Size(130, 38);
+            btnPreview.Size = new Size(160, 42);
+            btnPreview.TextAlign = ContentAlignment.MiddleCenter;
             btnPreview.Location = new Point(16, 11);
             btnPreview.Cursor = Cursors.Hand;
             btnPreview.Click += (s, e) => {
@@ -119,7 +125,8 @@ namespace Chroniq.UI
             btnCancel.ForeColor = Color.White;
             btnCancel.FlatStyle = FlatStyle.Flat;
             btnCancel.FlatAppearance.BorderSize = 0;
-            btnCancel.Size = new Size(85, 38);
+            btnCancel.Size = new Size(95, 42);
+            btnCancel.TextAlign = ContentAlignment.MiddleCenter;
             btnCancel.Cursor = Cursors.Hand;
             btnCancel.Click += (s, e) => this.Close();
 
@@ -130,7 +137,8 @@ namespace Chroniq.UI
             btnSave.ForeColor = Color.White;
             btnSave.FlatStyle = FlatStyle.Flat;
             btnSave.FlatAppearance.BorderSize = 0;
-            btnSave.Size = new Size(175, 38);
+            btnSave.Size = new Size(190, 42);
+            btnSave.TextAlign = ContentAlignment.MiddleCenter;
             btnSave.Cursor = Cursors.Hand;
             btnSave.Click += (s, e) => SaveAndClose();
 
@@ -139,6 +147,7 @@ namespace Chroniq.UI
                 int pw = bottomPanel.ClientSize.Width > 0 ? bottomPanel.ClientSize.Width : (formW - 20);
                 btnSave.Location = new Point(pw - 16 - btnSave.Width, 11);
                 btnCancel.Location = new Point(btnSave.Left - 10 - btnCancel.Width, 11);
+                btnPreview.Location = new Point(16, 11);
             };
 
             bottomPanel.Resize += delegate(object s, EventArgs e) { relayoutBottomButtons(); };
@@ -307,6 +316,11 @@ namespace Chroniq.UI
             gbDisp.Controls.Add(lblDateLang); gbDisp.Controls.Add(cbDateLang);
             gbDisp.Controls.Add(lblSc); gbDisp.Controls.Add(tbScale); gbDisp.Controls.Add(lblScaleVal);
             page.Controls.Add(gbDisp);
+
+            // Generous bottom spacer so scale slider and all options scroll with plenty of room above the bottom bar
+            Panel generalSpacer = new Panel { Location = new Point(14, 780), Size = new Size(595, 90), BackColor = Color.Transparent };
+            page.Controls.Add(generalSpacer);
+            page.AutoScrollMinSize = new Size(595, 880);
         }
 
         private void UpdateModeUI()
@@ -334,6 +348,11 @@ namespace Chroniq.UI
             btnAccent = CreateColorRow(page, "Titik Poros Tengah / Divider Lipatan (Accent):", ref y);
             btnDateBg = CreateColorRow(page, "Kotak Latar Tanggal (Date Box BG):", ref y);
             btnDateText = CreateColorRow(page, "Teks Tanggal (Date Text):", ref y);
+
+            // Bottom spacer for colors tab
+            Panel colorsSpacer = new Panel { Location = new Point(14, y + 10), Size = new Size(595, 90), BackColor = Color.Transparent };
+            page.Controls.Add(colorsSpacer);
+            page.AutoScrollMinSize = new Size(595, y + 110);
         }
 
         private Button CreateColorRow(TabPage page, string label, ref int y)
