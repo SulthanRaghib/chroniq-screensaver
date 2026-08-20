@@ -11,7 +11,7 @@ namespace Chroniq.Rendering
     /// </summary>
     public static class AnalogClockRenderer
     {
-        public static void Render(Graphics g, ClockConfig config, int w, int h, int driftX, int driftY, DateTime now, bool previewMode)
+        public static void Render(Graphics g, ClockConfig config, int w, int h, float driftX, float driftY, DateTime now, bool previewMode)
         {
             float scale = previewMode ? 0.76f : config.ClockScale;
             float cx = (w / 2f) + driftX;

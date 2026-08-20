@@ -26,7 +26,7 @@ namespace Chroniq.Rendering
         private static readonly CardFlipState _minState = new CardFlipState { DurationMs = 450 };
         private static readonly CardFlipState _secState = new CardFlipState { DurationMs = 380 };
 
-        public static void Render(Graphics g, ClockConfig config, int w, int h, int driftX, int driftY, DateTime now, bool previewMode)
+        public static void Render(Graphics g, ClockConfig config, int w, int h, float driftX, float driftY, DateTime now, bool previewMode)
         {
             float scale = previewMode ? 0.72f : config.ClockScale;
             float cx = (w / 2f) + driftX;

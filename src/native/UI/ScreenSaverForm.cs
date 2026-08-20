@@ -83,7 +83,7 @@ namespace Chroniq.UI
         private void SetupTimer()
         {
             timer = new Timer();
-            timer.Interval = previewMode ? 40 : ((config.ClockMode == "analog" && config.SmoothSweep) ? 16 : 40);
+            timer.Interval = 15; // True 60 FPS for buttery-smooth sweep and flip transitions in all modes
             timer.Tick += (s, e) => {
                 if (previewMode)
                 {
@@ -134,12 +134,13 @@ namespace Chroniq.UI
 
             if (w <= 0 || h <= 0) return;
 
-            int driftX = 0, driftY = 0;
+            float driftX = 0f, driftY = 0f;
             if (config.AntiBurnIn && !previewMode)
             {
                 double elapsedSec = (now - startTime).TotalSeconds;
-                driftX = (int)(Math.Sin(elapsedSec / 120.0 * 2 * Math.PI) * 16.0);
-                driftY = (int)(Math.Cos(elapsedSec / 160.0 * 2 * Math.PI) * 14.0);
+                // Ultra-slow, continuous floating-point orbital drift (30-minute cycle, 0 discrete pixel jumping)
+                driftX = (float)(Math.Sin(elapsedSec / 1800.0 * 2.0 * Math.PI) * 12.0);
+                driftY = (float)(Math.Cos(elapsedSec / 2400.0 * 2.0 * Math.PI) * 10.0);
             }
 
             if (config.ClockMode == "digital")
