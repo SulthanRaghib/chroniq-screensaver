@@ -59,8 +59,11 @@ namespace Chroniq.UI
 
         private void InitUI()
         {
-            this.Text = "Chroniq — Pengaturan Screensaver Jam (Analog & Digital)";
-            this.Size = new Size(660, 840);
+            // Window sizing adaptive to display resolution and DPI scaling
+            Rectangle workArea = Screen.PrimaryScreen.WorkingArea;
+            int formW = Math.Min(660, workArea.Width - 30);
+            int formH = Math.Min(680, workArea.Height - 50);
+            this.Size = new Size(formW, formH);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -84,7 +87,7 @@ namespace Chroniq.UI
             tabs.TabPages.Add(tabGeneral);
             tabs.TabPages.Add(tabColors);
 
-            // Bottom Panel for Action Buttons
+            // Bottom Panel for Action Buttons (Always pinned and visible)
             Panel bottomPanel = new Panel();
             bottomPanel.Dock = DockStyle.Bottom;
             bottomPanel.Height = 60;
@@ -117,8 +120,6 @@ namespace Chroniq.UI
             btnCancel.FlatStyle = FlatStyle.Flat;
             btnCancel.FlatAppearance.BorderSize = 0;
             btnCancel.Size = new Size(85, 38);
-            btnCancel.Location = new Point(365, 11);
-            btnCancel.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnCancel.Cursor = Cursors.Hand;
             btnCancel.Click += (s, e) => this.Close();
 
@@ -129,18 +130,29 @@ namespace Chroniq.UI
             btnSave.ForeColor = Color.White;
             btnSave.FlatStyle = FlatStyle.Flat;
             btnSave.FlatAppearance.BorderSize = 0;
-            btnSave.Size = new Size(170, 38);
-            btnSave.Location = new Point(460, 11);
-            btnSave.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnSave.Size = new Size(175, 38);
             btnSave.Cursor = Cursors.Hand;
             btnSave.Click += (s, e) => SaveAndClose();
+
+            Action relayoutBottomButtons = delegate()
+            {
+                int pw = bottomPanel.ClientSize.Width > 0 ? bottomPanel.ClientSize.Width : (formW - 20);
+                btnSave.Location = new Point(pw - 16 - btnSave.Width, 11);
+                btnCancel.Location = new Point(btnSave.Left - 10 - btnCancel.Width, 11);
+            };
+
+            bottomPanel.Resize += delegate(object s, EventArgs e) { relayoutBottomButtons(); };
+            bottomPanel.Layout += delegate(object s, LayoutEventArgs e) { relayoutBottomButtons(); };
+            relayoutBottomButtons();
 
             bottomPanel.Controls.Add(btnPreview);
             bottomPanel.Controls.Add(btnCancel);
             bottomPanel.Controls.Add(btnSave);
 
+            // IMPORTANT: Add tabs and bottomPanel, bring bottomPanel to front
             this.Controls.Add(tabs);
             this.Controls.Add(bottomPanel);
+            bottomPanel.BringToFront();
 
             // Build Tab Content
             BuildGeneralTab(tabGeneral);
