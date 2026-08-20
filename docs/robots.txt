@@ -1,11 +1,11 @@
 # Chroniq Screensaver — robots.txt
-# https://sulthanraghib.github.io/chroniq-screensaver/
+# https://chroniq-screensaver.vercel.app/
 
 User-agent: *
 Allow: /
 
 # Sitemap Location
-Sitemap: https://sulthanraghib.github.io/chroniq-screensaver/sitemap.xml
+Sitemap: https://chroniq-screensaver.vercel.app/sitemap.xml
 
 # Crawl-delay (optional, polite)
 Crawl-delay: 1
