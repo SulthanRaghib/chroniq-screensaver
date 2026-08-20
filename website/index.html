@@ -77,10 +77,6 @@
 
       <!-- CTA Buttons -->
       <div class="hidden sm:flex items-center gap-4">
-        <a href="https://github.com/SulthanRaghib/chroniq-screensaver" target="_blank" class="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-xl glass-pill text-gray-300 hover:text-white hover:border-white/20 transition-all">
-          <i data-lucide="github" class="w-4 h-4"></i>
-          <span>GitHub</span>
-        </a>
         <a href="dist/Chroniq_Setup.exe" download="Chroniq_Setup.exe" class="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/25 glow-btn">
           <i data-lucide="download" class="w-4 h-4"></i>
           <span>Download Free Setup</span>
@@ -102,9 +98,6 @@
         <a href="#presets" class="py-1 hover:text-cyan-400">Presets</a>
         <a href="#installation" class="py-1 hover:text-cyan-400">How to Install</a>
         <a href="#faq" class="py-1 hover:text-cyan-400">FAQ</a>
-        <a href="https://github.com/SulthanRaghib/chroniq-screensaver" target="_blank" class="py-1 hover:text-cyan-400 flex items-center gap-2">
-          <i data-lucide="github" class="w-4 h-4"></i> GitHub Repository
-        </a>
         <a href="dist/Chroniq_Setup.exe" download="Chroniq_Setup.exe" class="mt-2 text-center py-2.5 rounded-xl bg-blue-600 text-white font-semibold">Download 1-Click Installer (.EXE)</a>
       </div>
     </div>
@@ -434,7 +427,7 @@
           </div>
           <div class="faq-answer">
             <p class="text-xs text-gray-400 pt-3 leading-relaxed">
-              Yes, Chroniq is 100% free, open-source, and contains zero ads, telemetry, or bloatware. You can view and contribute to the entire source code on <a href="https://github.com/SulthanRaghib/chroniq-screensaver" target="_blank" class="text-cyan-400 hover:underline font-semibold">GitHub</a>.
+              Yes, Chroniq is 100% free with zero ads, telemetry, background tracking, or bloatware. Built with precision and care for pure desktop aesthetics.
             </p>
           </div>
         </div>
@@ -525,25 +518,207 @@
   </section>
 
   <!-- 9. Footer -->
-  <footer class="py-12 px-6 border-t border-white/5 text-xs text-gray-400 bg-[#05070A]">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-      <div class="flex items-center gap-3">
-        <img src="assets/chroniq_icon.png" alt="Chroniq" class="w-6 h-6 rounded-lg" />
-        <span class="font-bold text-white tracking-tight">CHRONIQ SCREENSAVER</span>
-        <span>•</span>
-        <span>Crafted with precision for desktop aesthetics</span>
+  <footer class="py-14 px-6 border-t border-white/10 text-xs text-gray-400 bg-[#04060A] relative z-10">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+      
+      <!-- Brand & Creator -->
+      <div class="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+        <img src="assets/chroniq_icon.png" alt="Chroniq" class="w-9 h-9 rounded-xl shadow-lg shadow-cyan-500/20" />
+        <div>
+          <div class="font-bold text-sm text-white tracking-wider uppercase">Chroniq Screensaver</div>
+          <p class="text-gray-400 text-xs mt-0.5">
+            Crafted with precision & passion by 
+            <a href="https://www.linkedin.com/in/sulthan-raghib-fillah/" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 font-semibold inline-flex items-center gap-1 hover:underline">
+              Sulthan Raghib Fillah
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </p>
+        </div>
       </div>
 
-      <div class="flex items-center gap-6 text-gray-400">
-        <a href="#simulator" class="hover:text-white transition-colors">Simulator</a>
-        <a href="#features" class="hover:text-white transition-colors">Features</a>
-        <a href="#installation" class="hover:text-white transition-colors">Install</a>
-        <a href="https://github.com/SulthanRaghib/chroniq-screensaver" target="_blank" class="hover:text-white transition-colors flex items-center gap-1">
-          <i data-lucide="github" class="w-4 h-4"></i> GitHub
+      <!-- Legal Document Triggers -->
+      <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 font-medium">
+        <button type="button" onclick="openLegalModal('privacy')" class="hover:text-cyan-300 transition-colors cursor-pointer flex items-center gap-1.5 py-1">
+          <i data-lucide="shield-check" class="w-4 h-4 text-cyan-400"></i>
+          <span>Kebijakan Privasi (Privacy Policy)</span>
+        </button>
+        <span class="text-white/20 hidden sm:inline">•</span>
+        <button type="button" onclick="openLegalModal('terms')" class="hover:text-cyan-300 transition-colors cursor-pointer flex items-center gap-1.5 py-1">
+          <i data-lucide="scale" class="w-4 h-4 text-cyan-400"></i>
+          <span>Syarat & Hak Cipta (Terms & Copyright)</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Copyright & Disclaimer Sub-Footer -->
+    <div class="max-w-6xl mx-auto mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-gray-400 text-center sm:text-left">
+      <div>
+        Copyright © 2026 <b>Chroniq</b>. All rights reserved. Designed & Engineered by <a href="https://www.linkedin.com/in/sulthan-raghib-fillah/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-cyan-400 underline">Sulthan Raghib Fillah</a>.
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="https://www.linkedin.com/in/sulthan-raghib-fillah/" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-blue-400 flex items-center gap-1.5 transition-colors font-medium">
+          <i data-lucide="linkedin" class="w-3.5 h-3.5 text-blue-400"></i>
+          <span>LinkedIn Profile</span>
         </a>
       </div>
     </div>
   </footer>
+
+  <!-- Luxury Glassmorphism Legal Modal (Privacy Policy & Terms of Service) -->
+  <div id="legal-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 opacity-0 pointer-events-none transition-all duration-300">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-md" onclick="closeLegalModal()"></div>
+
+    <!-- Modal Dialog Window -->
+    <div id="legal-dialog-card" class="relative w-full max-w-3xl max-h-[85vh] flex flex-col rounded-3xl bg-[#0B0F19]/95 border border-white/15 shadow-2xl shadow-cyan-950/50 backdrop-blur-2xl overflow-hidden z-10 scale-95 transition-transform duration-300">
+      
+      <!-- Modal Header -->
+      <div class="flex items-center justify-between px-6 py-5 border-b border-white/10 bg-white/[0.02]">
+        <div class="flex items-center gap-3">
+          <img src="assets/chroniq_icon.png" alt="Chroniq" class="w-7 h-7 rounded-lg" />
+          <h3 class="text-base sm:text-lg font-bold text-white tracking-tight">Dokumen Hukum & Privasi Chroniq</h3>
+        </div>
+        <button type="button" onclick="closeLegalModal()" class="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="flex border-b border-white/10 bg-white/[0.01] px-6">
+        <button id="tab-btn-privacy" onclick="switchLegalTab('privacy')" class="py-3 px-4 font-semibold text-sm border-b-2 border-cyan-400 text-cyan-400 transition-colors flex items-center gap-2 cursor-pointer">
+          <i data-lucide="shield-check" class="w-4 h-4"></i>
+          <span>Kebijakan Privasi</span>
+        </button>
+        <button id="tab-btn-terms" onclick="switchLegalTab('terms')" class="py-3 px-4 font-semibold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition-colors flex items-center gap-2 cursor-pointer">
+          <i data-lucide="scale" class="w-4 h-4"></i>
+          <span>Syarat Layanan & Hak Cipta</span>
+        </button>
+      </div>
+
+      <!-- Scrollable Content Body -->
+      <div class="flex-1 overflow-y-auto px-6 py-6 text-gray-300 text-xs sm:text-sm leading-relaxed space-y-6">
+        
+        <!-- Tab Content 1: Privacy Policy -->
+        <div id="legal-content-privacy" class="space-y-4">
+          <div class="p-4 rounded-2xl bg-cyan-950/30 border border-cyan-500/20 text-cyan-200 text-xs flex items-start gap-3">
+            <i data-lucide="lock" class="w-5 h-5 text-cyan-400 shrink-0 mt-0.5"></i>
+            <div>
+              <b>Ringkasan Privasi:</b> Chroniq beroperasi <b>100% secara offline</b> di komputer Anda. Kami sama sekali tidak mengumpulkan, menyimpan, mentransmisikan, atau menjual data pribadi Anda.
+            </div>
+          </div>
+
+          <h4 class="text-base font-bold text-white">1. Tidak Ada Pengumpulan Data Pribadi (Zero Data Collection)</h4>
+          <p class="text-gray-400 text-xs">
+            Aplikasi screensaver Chroniq dan website resminya tidak meminta, mencatat, atau mengumpulkan informasi identitas pribadi (seperti nama, email, lokasi, atau penekanan tombol keyboard). Seluruh rendering jam analog dan digital diproses langsung oleh kartu grafis/CPU perangkat lokal Anda.
+          </p>
+
+          <h4 class="text-base font-bold text-white">2. Penyimpanan Konfigurasi Lokal (Local Storage)</h4>
+          <p class="text-gray-400 text-xs">
+            Pengaturan preferensi yang Anda pilih (seperti tema warna, format 24 jam, dan gaya jarum) disimpan secara eksklusif dalam file konfigurasi lokal di folder direktori sistem Anda (<code class="text-cyan-300 bg-white/5 px-1.5 py-0.5 rounded">%LocalAppData%\Chroniq\settings.json</code> atau Registry lokal Windows). Data konfigurasi ini tidak pernah dikirim ke jaringan internet atau server mana pun.
+          </p>
+
+          <h4 class="text-base font-bold text-white">3. Tanpa Iklan, Telemetri, atau Pelacak Pihak Ketiga</h4>
+          <p class="text-gray-400 text-xs">
+            Chroniq bebas 100% dari SDK analitik pelacak, telemetri latar belakang, spyware, adware, maupun cookies pelacak iklan komersial.
+          </p>
+
+          <h4 class="text-base font-bold text-white">4. Kepatuhan Regulasi Perlindungan Data</h4>
+          <p class="text-gray-400 text-xs">
+            Kebijakan privasi ini disusun sesuai dengan prinsip privasi internasional termasuk <i>General Data Protection Regulation (GDPR)</i>, <i>California Consumer Privacy Act (CCPA)</i>, dan Undang-Undang Perlindungan Data Pribadi (UU PDP No. 27/2022).
+          </p>
+        </div>
+
+        <!-- Tab Content 2: Terms of Service & Copyright -->
+        <div id="legal-content-terms" class="hidden space-y-4">
+          <div class="p-4 rounded-2xl bg-blue-950/30 border border-blue-500/20 text-blue-200 text-xs flex items-start gap-3">
+            <i data-lucide="copyright" class="w-5 h-5 text-blue-400 shrink-0 mt-0.5"></i>
+            <div>
+              <b>Hak Cipta Terdaftar:</b> Chroniq adalah karya cipta asli yang dirancang dan dikembangkan oleh <b>Sulthan Raghib Fillah</b>.
+            </div>
+          </div>
+
+          <h4 class="text-base font-bold text-white">1. Hak Kekayaan Intelektual (Intellectual Property)</h4>
+          <p class="text-gray-400 text-xs">
+            Seluruh hak cipta, merek dagang, desain grafis piringan jam, ikon antarmuka, arsitektur kode sumber, dan dokumentasi visual Chroniq adalah milik eksklusif <b>Sulthan Raghib Fillah</b> (© 2026 Sulthan Raghib Fillah. All Rights Reserved).
+          </p>
+
+          <h4 class="text-base font-bold text-white">2. Pemberian Izin Penggunaan (License Grant)</h4>
+          <p class="text-gray-400 text-xs">
+            Pengguna diberikan hak bebas royalti, non-eksklusif, dan dapat dibatalkan untuk mengunduh, memasang, dan menikmati Chroniq Screensaver pada perangkat pribadi maupun komputer kerja tanpa biaya apa pun.
+          </p>
+
+          <h4 class="text-base font-bold text-white">3. Batasan Penggunaan</h4>
+          <p class="text-gray-400 text-xs">
+            Dilarang mendistribusikan ulang, membundel ke dalam paket installer berbayar, mengubah atribusi hak cipta pencipta, atau melakukan tindakan *reverse-engineering* berbahaya untuk tujuan komersialisasi pihak ketiga tanpa persetujuan tertulis dari Author.
+          </p>
+
+          <h4 class="text-base font-bold text-white">4. Penafian Tanggung Jawab (Disclaimer of Warranty)</h4>
+          <p class="text-gray-400 text-xs">
+            Software disediakan "SEBAGAIMANA ADANYA" (*AS-IS*) tanpa jaminan apa pun baik tersurat maupun tersirat. Pencipta tidak bertanggung jawab atas segala bentuk kerusakan perangkat keras, kehilangan data, atau gangguan sistem yang timbul dari penggunaan software ini.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="px-6 py-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-between">
+        <span class="text-[11px] text-gray-500">Terakhir Diperbarui: 20 Agustus 2026</span>
+        <button type="button" onclick="closeLegalModal()" class="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs transition-all cursor-pointer">
+          Saya Mengerti (Tutup)
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Legal Modal Script -->
+  <script>
+    function openLegalModal(tab = 'privacy') {
+      const modal = document.getElementById('legal-modal');
+      const dialog = document.getElementById('legal-dialog-card');
+      if (!modal || !dialog) return;
+      switchLegalTab(tab);
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+      dialog.classList.remove('scale-95');
+      dialog.classList.add('scale-100');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLegalModal() {
+      const modal = document.getElementById('legal-modal');
+      const dialog = document.getElementById('legal-dialog-card');
+      if (!modal || !dialog) return;
+      dialog.classList.remove('scale-100');
+      dialog.classList.add('scale-95');
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      document.body.style.overflow = '';
+    }
+
+    function switchLegalTab(tab) {
+      const btnPrivacy = document.getElementById('tab-btn-privacy');
+      const btnTerms = document.getElementById('tab-btn-terms');
+      const contentPrivacy = document.getElementById('legal-content-privacy');
+      const contentTerms = document.getElementById('legal-content-terms');
+
+      if (tab === 'privacy') {
+        btnPrivacy.className = "py-3 px-4 font-semibold text-sm border-b-2 border-cyan-400 text-cyan-400 transition-colors flex items-center gap-2 cursor-pointer";
+        btnTerms.className = "py-3 px-4 font-semibold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition-colors flex items-center gap-2 cursor-pointer";
+        contentPrivacy.classList.remove('hidden');
+        contentTerms.classList.add('hidden');
+      } else {
+        btnTerms.className = "py-3 px-4 font-semibold text-sm border-b-2 border-cyan-400 text-cyan-400 transition-colors flex items-center gap-2 cursor-pointer";
+        btnPrivacy.className = "py-3 px-4 font-semibold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition-colors flex items-center gap-2 cursor-pointer";
+        contentTerms.classList.remove('hidden');
+        contentPrivacy.classList.add('hidden');
+      }
+      if (window.lucide) lucide.createIcons();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLegalModal();
+    });
+  </script>
 
   <!-- Init Lucide Icons -->
   <script>
