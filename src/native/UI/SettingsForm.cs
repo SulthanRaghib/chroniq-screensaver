@@ -327,7 +327,7 @@ namespace Chroniq.UI
         {
             bool isDigital = rbDigital.Checked;
             gbDigital.Enabled = isDigital;
-            gbDigital.Visible = isDigital;
+            gbDigital.Visible = true;
 
             gbStyle.Enabled = !isDigital;
             gbHands.Enabled = !isDigital;
