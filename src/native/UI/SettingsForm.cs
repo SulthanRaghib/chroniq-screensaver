@@ -79,7 +79,7 @@ namespace Chroniq.UI
             // Tab Control
             TabControl tabs = new TabControl();
             tabs.Dock = DockStyle.Fill;
-            tabs.Padding = new Point(14, 6);
+            tabs.Padding = new Point(16, 7);
 
             TabPage tabGeneral = new TabPage("  Mode & Gaya Jam  ");
             tabGeneral.BackColor = Color.White;
@@ -107,7 +107,7 @@ namespace Chroniq.UI
             btnPreview.FlatAppearance.BorderSize = 0;
             btnPreview.Size = new Size(160, 42);
             btnPreview.TextAlign = ContentAlignment.MiddleCenter;
-            btnPreview.Location = new Point(16, 11);
+            btnPreview.Location = new Point(18, 11);
             btnPreview.Cursor = Cursors.Hand;
             btnPreview.Click += (s, e) => {
                 ClockConfig previewConfig = BuildCurrentUIConfig();
@@ -145,9 +145,9 @@ namespace Chroniq.UI
             Action relayoutBottomButtons = delegate()
             {
                 int pw = bottomPanel.ClientSize.Width > 0 ? bottomPanel.ClientSize.Width : (formW - 20);
-                btnSave.Location = new Point(pw - 16 - btnSave.Width, 11);
-                btnCancel.Location = new Point(btnSave.Left - 10 - btnCancel.Width, 11);
-                btnPreview.Location = new Point(16, 11);
+                btnSave.Location = new Point(pw - 18 - btnSave.Width, 11);
+                btnCancel.Location = new Point(btnSave.Left - 12 - btnCancel.Width, 11);
+                btnPreview.Location = new Point(18, 11);
             };
 
             bottomPanel.Resize += delegate(object s, EventArgs e) { relayoutBottomButtons(); };
@@ -170,16 +170,19 @@ namespace Chroniq.UI
 
         private void BuildGeneralTab(TabPage page)
         {
+            const int marginX = 18;
+            const int groupW = 600;
+
             // 0. Mode Selector Group
             GroupBox gbMode = new GroupBox();
             gbMode.Text = " ⏱️ Pilih Mode Tampilan Screensaver ";
             gbMode.Font = new Font("Segoe UI", 9.5F, FontStyle.Bold);
             gbMode.ForeColor = Color.FromArgb(30, 41, 59);
-            gbMode.Location = new Point(14, 14);
-            gbMode.Size = new Size(595, 65);
+            gbMode.Location = new Point(marginX, 16);
+            gbMode.Size = new Size(groupW, 68);
 
-            rbAnalog = new RadioButton { Text = "Jam Analog 🕰️", Font = new Font("Segoe UI", 9.5F, FontStyle.Bold), Location = new Point(30, 25), AutoSize = true, Checked = true };
-            rbDigital = new RadioButton { Text = "Jam Digital (Flip / Modern) 🔢", Font = new Font("Segoe UI", 9.5F, FontStyle.Bold), Location = new Point(230, 25), AutoSize = true };
+            rbAnalog = new RadioButton { Text = "Jam Analog 🕰️", Font = new Font("Segoe UI", 9.5F, FontStyle.Bold), Location = new Point(24, 26), AutoSize = true, Checked = true };
+            rbDigital = new RadioButton { Text = "Jam Digital (Flip / Modern) 🔢", Font = new Font("Segoe UI", 9.5F, FontStyle.Bold), Location = new Point(230, 26), AutoSize = true };
 
             rbAnalog.CheckedChanged += (s, e) => {
                 if (isUpdatingUI) return;
@@ -206,11 +209,11 @@ namespace Chroniq.UI
             GroupBox gbPreset = new GroupBox();
             gbPreset.Text = " 🎨 Tema & Preset Warna ";
             gbPreset.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            gbPreset.Location = new Point(14, 88);
-            gbPreset.Size = new Size(595, 65);
+            gbPreset.Location = new Point(marginX, 98);
+            gbPreset.Size = new Size(groupW, 68);
 
-            Label lblP = new Label { Text = "Pilih Preset:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 26), AutoSize = true };
-            cbPreset = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(120, 23), Size = new Size(280, 25) };
+            Label lblP = new Label { Text = "Pilih Preset:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 27), AutoSize = true };
+            cbPreset = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(120, 24), Size = new Size(290, 25) };
             cbPreset.Items.AddRange(new object[] {
                 "Modern Dark", "Fliqlo Monochrome", "Classic Vintage Roman",
                 "Swiss Railway (Bauhaus)", "Midnight Sapphire", "Cyberpunk Neon",
@@ -235,15 +238,15 @@ namespace Chroniq.UI
             gbDigital = new GroupBox();
             gbDigital.Text = " 🔢 Opsi Jam Digital ";
             gbDigital.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            gbDigital.Location = new Point(14, 162);
-            gbDigital.Size = new Size(595, 125);
+            gbDigital.Location = new Point(marginX, 180);
+            gbDigital.Size = new Size(groupW, 135);
 
-            Label lblDigSt = new Label { Text = "Gaya Tampilan Digital:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 26), AutoSize = true };
-            cbDigitalStyle = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(190, 23), Size = new Size(280, 25) };
+            Label lblDigSt = new Label { Text = "Gaya Tampilan Digital:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 26), AutoSize = true };
+            cbDigitalStyle = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(190, 23), Size = new Size(290, 25) };
             cbDigitalStyle.Items.AddRange(new object[] { "flip (Kartu Flip ala Fliqlo)", "minimal (Teks Bersih Tanpa Kartu)" });
 
-            chk24Hour = new CheckBox { Text = "Gunakan Format 24 Jam (Contoh: 23:50 vs 11:50 PM)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 60), AutoSize = true };
-            chkDigitalSec = new CheckBox { Text = "Tampilkan Detik Digital", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 88), AutoSize = true };
+            chk24Hour = new CheckBox { Text = "Gunakan Format 24 Jam (Contoh: 23:50 vs 11:50 PM)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 62), AutoSize = true };
+            chkDigitalSec = new CheckBox { Text = "Tampilkan Detik Digital", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 92), AutoSize = true };
 
             gbDigital.Controls.Add(lblDigSt);
             gbDigital.Controls.Add(cbDigitalStyle);
@@ -255,15 +258,15 @@ namespace Chroniq.UI
             gbStyle = new GroupBox();
             gbStyle.Text = " 🕰️ Desain Jam & Penanda (Khusus Analog) ";
             gbStyle.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            gbStyle.Location = new Point(14, 296);
-            gbStyle.Size = new Size(595, 98);
+            gbStyle.Location = new Point(marginX, 329);
+            gbStyle.Size = new Size(groupW, 102);
 
-            Label lblSt = new Label { Text = "Gaya Desain:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 26), AutoSize = true };
-            cbStyle = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(180, 23), Size = new Size(240, 25) };
+            Label lblSt = new Label { Text = "Gaya Desain:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 26), AutoSize = true };
+            cbStyle = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(180, 23), Size = new Size(250, 25) };
             cbStyle.Items.AddRange(new object[] { "modern", "classic", "bauhaus", "sport", "minimal" });
 
-            Label lblNum = new Label { Text = "Tipe Angka:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 60), AutoSize = true };
-            cbNumeral = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(180, 57), Size = new Size(240, 25) };
+            Label lblNum = new Label { Text = "Tipe Angka:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 62), AutoSize = true };
+            cbNumeral = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(180, 59), Size = new Size(250, 25) };
             cbNumeral.Items.AddRange(new object[] { "arabic", "roman", "dots", "lines", "none" });
 
             gbStyle.Controls.Add(lblSt); gbStyle.Controls.Add(cbStyle);
@@ -274,13 +277,13 @@ namespace Chroniq.UI
             gbHands = new GroupBox();
             gbHands.Text = " ⏱️ Opsi Jarum Jam & Animasi (Khusus Analog) ";
             gbHands.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            gbHands.Location = new Point(14, 402);
-            gbHands.Size = new Size(595, 138);
+            gbHands.Location = new Point(marginX, 445);
+            gbHands.Size = new Size(groupW, 142);
 
-            chkHour = new CheckBox { Text = "Tampilkan Jarum Jam (Hour Hand)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 24), AutoSize = true };
-            chkMin = new CheckBox { Text = "Tampilkan Jarum Menit (Minute Hand)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 48), AutoSize = true };
-            chkSec = new CheckBox { Text = "Tampilkan Jarum Detik (Second Hand)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 72), AutoSize = true };
-            chkSweep = new CheckBox { Text = "Gerakan Mulus 60 FPS (Smooth Sweep Motion)", Font = new Font("Segoe UI", 9F, FontStyle.Bold), ForeColor = Color.FromArgb(37, 99, 235), Location = new Point(16, 100), AutoSize = true };
+            chkHour = new CheckBox { Text = "Tampilkan Jarum Jam (Hour Hand)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 24), AutoSize = true };
+            chkMin = new CheckBox { Text = "Tampilkan Jarum Menit (Minute Hand)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 48), AutoSize = true };
+            chkSec = new CheckBox { Text = "Tampilkan Jarum Detik (Second Hand)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 72), AutoSize = true };
+            chkSweep = new CheckBox { Text = "Gerakan Mulus 60 FPS (Smooth Sweep Motion)", Font = new Font("Segoe UI", 9F, FontStyle.Bold), ForeColor = Color.FromArgb(37, 99, 235), Location = new Point(18, 102), AutoSize = true };
 
             gbHands.Controls.Add(chkHour); gbHands.Controls.Add(chkMin); gbHands.Controls.Add(chkSec); gbHands.Controls.Add(chkSweep);
             page.Controls.Add(gbHands);
@@ -289,15 +292,15 @@ namespace Chroniq.UI
             GroupBox gbDisp = new GroupBox();
             gbDisp.Text = " 📐 Fitur Layar & Bahasa Tanggal ";
             gbDisp.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
-            gbDisp.Location = new Point(14, 548);
-            gbDisp.Size = new Size(595, 215);
+            gbDisp.Location = new Point(marginX, 601);
+            gbDisp.Size = new Size(groupW, 220);
 
-            chkDate = new CheckBox { Text = "Tampilkan Tanggal & Hari", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 24), AutoSize = true };
-            chkBorder = new CheckBox { Text = "Tampilkan Garis Tepi (Dial Border / Card Border)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 50), AutoSize = true };
-            chkAntiBurn = new CheckBox { Text = "Anti-Burn-In Protection (Pergeseran Mikro Layar OLED)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 76), AutoSize = true };
+            chkDate = new CheckBox { Text = "Tampilkan Tanggal & Hari", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 24), AutoSize = true };
+            chkBorder = new CheckBox { Text = "Tampilkan Garis Tepi (Dial Border / Card Border)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 50), AutoSize = true };
+            chkAntiBurn = new CheckBox { Text = "Anti-Burn-In Protection (Pergeseran Mikro Layar OLED)", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 76), AutoSize = true };
 
-            Label lblDateLang = new Label { Text = "Bahasa & Format Tanggal:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 114), AutoSize = true };
-            cbDateLang = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(200, 110), Size = new Size(280, 25) };
+            Label lblDateLang = new Label { Text = "Bahasa & Format Tanggal:", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 114), AutoSize = true };
+            cbDateLang = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(200, 110), Size = new Size(290, 25) };
             cbDateLang.Items.AddRange(new object[] {
                 "Default Sistem (Otomatis)",
                 "Bahasa Indonesia (RAB 19 AGU)",
@@ -307,9 +310,9 @@ namespace Chroniq.UI
                 "Format Angka (19/08/2026)"
             });
 
-            Label lblSc = new Label { Text = "Ukuran Jam (% Layar):", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(16, 158), AutoSize = true };
-            tbScale = new TrackBar { Minimum = 40, Maximum = 90, Value = 72, TickFrequency = 5, Location = new Point(200, 152), Size = new Size(240, 45) };
-            lblScaleVal = new Label { Text = "72%", Font = new Font("Segoe UI", 9F, FontStyle.Bold), Location = new Point(450, 158), AutoSize = true };
+            Label lblSc = new Label { Text = "Ukuran Jam (% Layar):", Font = new Font("Segoe UI", 9F, FontStyle.Regular), Location = new Point(18, 156), AutoSize = true };
+            tbScale = new TrackBar { Minimum = 40, Maximum = 90, Value = 72, TickFrequency = 5, Location = new Point(200, 150), Size = new Size(280, 45) };
+            lblScaleVal = new Label { Text = "72%", Font = new Font("Segoe UI", 9F, FontStyle.Bold), Location = new Point(490, 156), AutoSize = true };
             tbScale.ValueChanged += (s, e) => { lblScaleVal.Text = tbScale.Value + "%"; };
 
             gbDisp.Controls.Add(chkDate); gbDisp.Controls.Add(chkBorder); gbDisp.Controls.Add(chkAntiBurn);
@@ -318,9 +321,9 @@ namespace Chroniq.UI
             page.Controls.Add(gbDisp);
 
             // Generous bottom spacer so scale slider and all options scroll with plenty of room above the bottom bar
-            Panel generalSpacer = new Panel { Location = new Point(14, 780), Size = new Size(595, 90), BackColor = Color.Transparent };
+            Panel generalSpacer = new Panel { Location = new Point(marginX, 835), Size = new Size(groupW, 100), BackColor = Color.Transparent };
             page.Controls.Add(generalSpacer);
-            page.AutoScrollMinSize = new Size(595, 880);
+            page.AutoScrollMinSize = new Size(groupW, 940);
         }
 
         private void UpdateModeUI()
@@ -335,7 +338,7 @@ namespace Chroniq.UI
 
         private void BuildColorsTab(TabPage page)
         {
-            int y = 14;
+            int y = 18;
             btnBg = CreateColorRow(page, "Latar Belakang Layar (Background):", ref y);
             btnDial = CreateColorRow(page, "Permukaan Piringan / Kartu Digital (Dial / Card Face):", ref y);
             btnBorder = CreateColorRow(page, "Garis Batas Piringan / Kartu (Border):", ref y);
@@ -350,22 +353,22 @@ namespace Chroniq.UI
             btnDateText = CreateColorRow(page, "Teks Tanggal (Date Text):", ref y);
 
             // Bottom spacer for colors tab
-            Panel colorsSpacer = new Panel { Location = new Point(14, y + 10), Size = new Size(595, 90), BackColor = Color.Transparent };
+            Panel colorsSpacer = new Panel { Location = new Point(18, y + 10), Size = new Size(600, 100), BackColor = Color.Transparent };
             page.Controls.Add(colorsSpacer);
-            page.AutoScrollMinSize = new Size(595, y + 110);
+            page.AutoScrollMinSize = new Size(600, y + 120);
         }
 
         private Button CreateColorRow(TabPage page, string label, ref int y)
         {
             Label lbl = new Label();
             lbl.Text = label;
-            lbl.Location = new Point(16, y + 4);
-            lbl.Size = new Size(300, 20);
+            lbl.Location = new Point(18, y + 4);
+            lbl.Size = new Size(320, 20);
             page.Controls.Add(lbl);
 
             Button btn = new Button();
             btn.Size = new Size(130, 26);
-            btn.Location = new Point(330, y);
+            btn.Location = new Point(350, y);
             btn.FlatStyle = FlatStyle.Flat;
             btn.Cursor = Cursors.Hand;
             btn.Font = new Font("Consolas", 8.5F, FontStyle.Bold);
