@@ -1,0 +1,16 @@
+# Chroniq Screensaver — robots.txt
+# https://sulthanraghib.github.io/chroniq-screensaver/
+
+User-agent: *
+Allow: /
+
+# Sitemap Location
+Sitemap: https://sulthanraghib.github.io/chroniq-screensaver/sitemap.xml
+
+# Crawl-delay (optional, polite)
+Crawl-delay: 1
+
+# Disallow build artifacts and scripts from indexing
+Disallow: /scripts/
+Disallow: /src/
+Disallow: /tests/
