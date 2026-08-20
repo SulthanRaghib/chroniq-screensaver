@@ -203,7 +203,7 @@ namespace Chroniq.Rendering
                 }
 
                 // Draw digits
-                float fontSize = Math.Max(8f, rect.Height * (previewMode ? 0.52f : 0.54f));
+                float fontSize = Math.Max(8f, rect.Height * (previewMode ? 0.48f : 0.51f));
                 using (Font font = new Font("Segoe UI", fontSize, FontStyle.Bold))
                 using (Brush textBrush = new SolidBrush(textColor))
                 using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
@@ -211,15 +211,27 @@ namespace Chroniq.Rendering
                     g.DrawString(text, font, textBrush, cx, rect.Y + rect.Height / 2f, sf);
                 }
 
-                // Draw badge if applicable (top half only)
+                // Draw AM/PM badge (top-left pill indicator, 100% clear from digits)
                 if (isTop && !string.IsNullOrEmpty(badgeText))
                 {
-                    float badgeFontSize = Math.Max(5f, rect.Height * (previewMode ? 0.10f : 0.12f));
+                    float badgeFontSize = Math.Max(4.5f, rect.Height * (previewMode ? 0.070f : 0.078f));
                     using (Font badgeFont = new Font("Segoe UI", badgeFontSize, FontStyle.Bold))
-                    using (Brush badgeBrush = new SolidBrush(textColor))
-                    using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Near, LineAlignment = StringAlignment.Near })
+                    using (Brush badgeBrush = new SolidBrush(Color.FromArgb(215, textColor)))
+                    using (Brush pillBg = new SolidBrush(Color.FromArgb(80, 0, 0, 0)))
+                    using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                     {
-                        g.DrawString(badgeText, badgeFont, badgeBrush, rect.X + rect.Width * 0.08f, rect.Y + rect.Height * 0.07f, sf);
+                        SizeF bsz = g.MeasureString(badgeText, badgeFont);
+                        float px = rect.X + rect.Width * 0.055f;
+                        float py = rect.Y + rect.Height * 0.055f;
+                        float pw = bsz.Width + rect.Width * 0.025f;
+                        float ph = bsz.Height * 0.88f;
+
+                        using (GraphicsPath pillPath = ColorHelper.RoundedRect(new RectangleF(px, py, pw, ph), Math.Max(2f, rect.Height * 0.015f)))
+                        {
+                            g.FillPath(pillBg, pillPath);
+                        }
+
+                        g.DrawString(badgeText, badgeFont, badgeBrush, px + pw / 2f, py + ph / 2f, sf);
                     }
                 }
 

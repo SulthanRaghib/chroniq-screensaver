@@ -333,20 +333,30 @@ class ClockSimulator {
     }
 
     // Digits
-    const fontSize = Math.max(16, h * 0.54);
+    const fontSize = Math.max(16, h * 0.51);
     ctx.font = `bold ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
     ctx.fillStyle = textColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, cx, cy);
 
-    // AM/PM badge (only on top half)
+    // AM/PM badge (top-left indicator pill, 100% clear from digits)
     if (isTop && badgeText) {
-      const badgeFontSize = Math.max(9, h * 0.12);
+      const badgeFontSize = Math.max(8, h * 0.078);
       ctx.font = `bold ${badgeFontSize}px 'Plus Jakarta Sans', sans-serif`;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      ctx.fillText(badgeText, x + w * 0.09, y + h * 0.08);
+      const textMetrics = ctx.measureText(badgeText);
+      const px = x + w * 0.055;
+      const py = y + h * 0.055;
+      const pw = textMetrics.width + w * 0.035;
+      const ph = badgeFontSize * 1.5;
+
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.40)';
+      this.roundRect(px, py, pw, ph, Math.max(2, h * 0.015), true, false);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.88)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(badgeText, px + pw / 2, py + ph / 2);
     }
 
     // 3D Shadow shading overlay
