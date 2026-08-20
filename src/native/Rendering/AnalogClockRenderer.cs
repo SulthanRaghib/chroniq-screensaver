@@ -98,18 +98,20 @@ namespace Chroniq.Rendering
             // 3. Numerals (Arabic or Roman)
             if (config.NumeralType == "arabic" || config.NumeralType == "roman")
             {
+                bool isRoman = config.NumeralType == "roman";
                 string[] romans = { "XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI" };
                 string[] arabics = { "12", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11" };
-                string[] list = config.NumeralType == "roman" ? romans : arabics;
+                string[] list = isRoman ? romans : arabics;
 
-                float fontSize = Math.Max(6f, radius * (config.NumeralType == "roman" ? 0.12f : 0.13f));
-                string fontName = config.NumeralType == "roman" || config.Style == "classic" ? "Georgia" : "Segoe UI";
+                float fontSize = Math.Max(6f, radius * (isRoman ? 0.105f : 0.125f));
+                string fontName = isRoman || config.Style == "classic" ? "Georgia" : "Segoe UI";
+                FontStyle fs = isRoman ? FontStyle.Regular : FontStyle.Bold;
 
-                using (Font font = new Font(fontName, fontSize, (config.NumeralType == "roman" ? FontStyle.Regular : FontStyle.Bold)))
+                using (Font font = new Font(fontName, fontSize, fs))
                 using (Brush numBrush = new SolidBrush(numColor))
                 using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 {
-                    float numDist = radius * 0.73f;
+                    float numDist = radius * (isRoman ? 0.76f : 0.74f);
                     for (int idx = 0; idx < 12; idx++)
                     {
                         double angleDeg = (idx * 30.0) - 90.0;
@@ -121,11 +123,12 @@ namespace Chroniq.Rendering
                 }
             }
 
-            // 4. Date Badge
+            // 4. Date Badge (Positioned with optimal clearance from numerals)
             if (config.ShowDate)
             {
                 string dateStr = ColorHelper.GetFormattedDate(now, config.DateFormatLanguage);
-                float dateFontSize = Math.Max(4.5f, radius * (previewMode ? 0.052f : 0.058f));
+                bool isRoman = config.NumeralType == "roman";
+                float dateFontSize = Math.Max(4.5f, radius * (previewMode ? 0.046f : (isRoman ? 0.050f : 0.054f)));
 
                 using (Font dateFont = new Font("Segoe UI", dateFontSize, FontStyle.Bold))
                 using (Brush dateTextBrush = new SolidBrush(ColorHelper.ParseColor(config.DateTextColor, Color.Gray)))
@@ -134,15 +137,16 @@ namespace Chroniq.Rendering
                 using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 {
                     SizeF sz = g.MeasureString(dateStr, dateFont);
-                    float bw = sz.Width + radius * (previewMode ? 0.06f : 0.08f);
-                    float bh = sz.Height + radius * 0.02f;
+                    float bw = sz.Width + radius * (previewMode ? 0.05f : 0.06f);
+                    float bh = sz.Height + radius * 0.015f;
+                    float dateY = cy + radius * (isRoman ? 0.32f : 0.36f);
                     float bx = cx - bw / 2f;
-                    float by = cy + radius * 0.38f - bh / 2f;
+                    float by = dateY - bh / 2f;
 
-                    GraphicsPath path = ColorHelper.RoundedRect(new RectangleF(bx, by, bw, bh), Math.Max(2f, radius * 0.02f));
+                    GraphicsPath path = ColorHelper.RoundedRect(new RectangleF(bx, by, bw, bh), Math.Max(2f, radius * 0.015f));
                     g.FillPath(dateBgBrush, path);
                     g.DrawPath(dateBorderPen, path);
-                    g.DrawString(dateStr, dateFont, dateTextBrush, cx, cy + radius * 0.38f, sf);
+                    g.DrawString(dateStr, dateFont, dateTextBrush, cx, dateY, sf);
                 }
             }
 

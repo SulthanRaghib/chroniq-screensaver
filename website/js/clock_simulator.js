@@ -482,19 +482,20 @@ class ClockSimulator {
       }
     }
 
-    // 3. Numerals
+    // 3. Numerals (Arabic or Roman)
     if (this.config.numeralType === 'arabic' || this.config.numeralType === 'roman') {
+      const isRoman = this.config.numeralType === 'roman';
       const arabics = ['12', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'];
       const romans = ['XII', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI'];
-      const list = this.config.numeralType === 'roman' ? romans : arabics;
-      const fontSize = Math.max(10, radius * 0.13);
+      const list = isRoman ? romans : arabics;
+      const fontSize = Math.max(9, radius * (isRoman ? 0.105 : 0.125));
 
-      ctx.font = `bold ${fontSize}px ${this.config.numeralType === 'roman' ? 'Georgia' : "'Plus Jakarta Sans'"}, sans-serif`;
+      ctx.font = `${isRoman ? '600' : 'bold'} ${fontSize}px ${isRoman ? "'Georgia', 'Times New Roman', serif" : "'Plus Jakarta Sans', sans-serif"}`;
       ctx.fillStyle = this.config.colors.numerals;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      const numDist = radius * 0.73;
+      const numDist = radius * (isRoman ? 0.76 : 0.74);
       for (let i = 0; i < 12; i++) {
         const angle = (i * 30 - 90) * (Math.PI / 180);
         const nx = cx + numDist * Math.cos(angle);
@@ -503,30 +504,32 @@ class ClockSimulator {
       }
     }
 
-    // 4. Date Badge
+    // 4. Date Badge (Positioned with optimal clearance from numerals)
     if (this.config.showDate) {
       const dateStr = this.getFormattedDate(now);
-      const dateFontSize = Math.max(9, radius * 0.058);
+      const isRoman = this.config.numeralType === 'roman';
+      const dateFontSize = Math.max(8, radius * (isRoman ? 0.050 : 0.054));
       ctx.font = `bold ${dateFontSize}px 'Plus Jakarta Sans', sans-serif`;
       const textMetrics = ctx.measureText(dateStr);
-      const bw = textMetrics.width + radius * 0.08;
-      const bh = dateFontSize * 1.8;
+      const bw = textMetrics.width + radius * 0.06;
+      const bh = dateFontSize * 1.6;
+      const dateY = cy + radius * (isRoman ? 0.32 : 0.36);
       const bx = cx - bw / 2;
-      const by = cy + radius * 0.40 - bh / 2;
+      const by = dateY - bh / 2;
 
       ctx.fillStyle = this.config.colors.dateBg;
-      this.roundRect(bx, by, bw, bh, Math.max(3, radius * 0.02), true, false);
+      this.roundRect(bx, by, bw, bh, Math.max(3, radius * 0.015), true, false);
 
       if (this.config.showBorder) {
         ctx.strokeStyle = this.config.colors.border;
         ctx.lineWidth = 1;
-        this.roundRect(bx, by, bw, bh, Math.max(3, radius * 0.02), false, true);
+        this.roundRect(bx, by, bw, bh, Math.max(3, radius * 0.015), false, true);
       }
 
       ctx.fillStyle = this.config.colors.dateText;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText(dateStr, cx, cy + radius * 0.40);
+      ctx.fillText(dateStr, cx, dateY);
     }
 
     // 5. Hands Angles
