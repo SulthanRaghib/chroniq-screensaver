@@ -332,24 +332,22 @@ class ClockSimulator {
       ctx.stroke();
     }
 
-    // Digits (dynamically offset slightly right when AM/PM badge is present to ensure 100% clean clearance)
-    const hasBadge = isTop && !!badgeText;
-    const textCenterX = hasBadge ? (cx + w * 0.05) : cx;
-    const fontSize = Math.max(16, h * (hasBadge ? 0.46 : 0.52));
+    // Digits (100% perfectly aligned and centered across top & bottom halves)
+    const fontSize = Math.max(16, h * 0.50);
     ctx.font = `bold ${fontSize}px 'Plus Jakarta Sans', sans-serif`;
     ctx.fillStyle = textColor;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, textCenterX, cy);
+    ctx.fillText(text, cx, cy);
 
-    // AM/PM badge (top-left indicator pill, 100% isolated and separated from hour digits)
-    if (hasBadge) {
-      const badgeFontSize = Math.max(7, h * 0.072);
+    // AM/PM badge (top-left indicator pill, 100% isolated and separated with plenty of vertical clearance)
+    if (isTop && badgeText) {
+      const badgeFontSize = Math.max(7, h * 0.070);
       ctx.font = `bold ${badgeFontSize}px 'Plus Jakarta Sans', sans-serif`;
       const textMetrics = ctx.measureText(badgeText);
       const px = x + w * 0.055;
-      const py = y + h * 0.060;
-      const pw = textMetrics.width + w * 0.025;
+      const py = y + h * 0.055;
+      const pw = textMetrics.width + w * 0.020;
       const ph = badgeFontSize * 1.5;
 
       ctx.fillStyle = 'rgba(0, 0, 0, 0.45)';

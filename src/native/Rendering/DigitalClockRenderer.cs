@@ -202,22 +202,19 @@ namespace Chroniq.Rendering
                     g.DrawPath(borderPen, path);
                 }
 
-                // Draw digits (dynamically offset slightly right when AM/PM badge is present to ensure 100% clean clearance)
-                bool hasBadge = isTop && !string.IsNullOrEmpty(badgeText);
-                float textCenterX = hasBadge ? (cx + rect.Width * 0.05f) : cx;
-                float fontSize = Math.Max(8f, rect.Height * (hasBadge ? 0.46f : (previewMode ? 0.49f : 0.52f)));
-
+                // Draw digits (100% perfectly aligned and centered across top & bottom halves)
+                float fontSize = Math.Max(8f, rect.Height * (previewMode ? 0.48f : 0.50f));
                 using (Font font = new Font("Segoe UI", fontSize, FontStyle.Bold))
                 using (Brush textBrush = new SolidBrush(textColor))
                 using (StringFormat sf = new StringFormat { Alignment = StringAlignment.Center, LineAlignment = StringAlignment.Center })
                 {
-                    g.DrawString(text, font, textBrush, textCenterX, rect.Y + rect.Height / 2f, sf);
+                    g.DrawString(text, font, textBrush, cx, rect.Y + rect.Height / 2f, sf);
                 }
 
-                // Draw AM/PM badge (top-left indicator pill, 100% isolated and separated from hour digits)
-                if (hasBadge)
+                // Draw AM/PM badge (placed cleanly in the upper-left corner with ample vertical clearance)
+                if (isTop && !string.IsNullOrEmpty(badgeText))
                 {
-                    float badgeFontSize = Math.Max(4.5f, rect.Height * (previewMode ? 0.065f : 0.072f));
+                    float badgeFontSize = Math.Max(4.5f, rect.Height * (previewMode ? 0.065f : 0.070f));
                     using (Font badgeFont = new Font("Segoe UI", badgeFontSize, FontStyle.Bold))
                     using (Brush badgeBrush = new SolidBrush(Color.FromArgb(225, textColor)))
                     using (Brush pillBg = new SolidBrush(Color.FromArgb(90, 0, 0, 0)))
@@ -225,7 +222,7 @@ namespace Chroniq.Rendering
                     {
                         SizeF bsz = g.MeasureString(badgeText, badgeFont);
                         float px = rect.X + rect.Width * 0.055f;
-                        float py = rect.Y + rect.Height * 0.060f;
+                        float py = rect.Y + rect.Height * 0.055f;
                         float pw = bsz.Width + rect.Width * 0.020f;
                         float ph = bsz.Height * 0.85f;
 
