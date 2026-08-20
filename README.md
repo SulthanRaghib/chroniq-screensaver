@@ -1,29 +1,28 @@
 <div align="center">
 
-<img src="assets/chroniq_icon.png" width="160" alt="Chroniq Logo" style="border-radius: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" />
+<img src="assets/chroniq_icon.png" width="140" alt="Chroniq Logo" style="border-radius: 28px; box-shadow: 0 12px 36px rgba(0,0,0,0.6);" />
 
 # ⏳ Chroniq Screensaver
-### *The Ultimate Aesthetic Analog & Digital Screensaver for Windows*
+### *The Ultimate Aesthetic Analog & 3D Flip Digital Screensaver for Windows*
 
 ![Platform](https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![Language](https://img.shields.io/badge/C%23-Native%20.NET-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
-![Mode](https://img.shields.io/badge/Mode-Analog%20%26%20Digital%20Flip-ff69b4?style=for-the-badge)
 ![Performance](https://img.shields.io/badge/Startup-0ms%20Instant-success?style=for-the-badge&logo=speedtest&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
-[![GitHub Repository](https://img.shields.io/badge/GitHub-SulthanRaghib%2Fchroniq--screensaver-181717?style=for-the-badge&logo=github)](https://github.com/SulthanRaghib/chroniq-screensaver)
+![Frame Rate](https://img.shields.io/badge/Rendering-60%20FPS%20Smooth-blueviolet?style=for-the-badge)
+![License](https://img.shields.io/badge/License-Proprietary%20Freeware-00D26A?style=for-the-badge)
 
 <p align="center">
-  <b>Screensaver Jam All-in-One (Analog & Digital) Modern, Elegan, dan Berperforma Tinggi untuk Windows.</b><br>
-  Didesain dengan arsitektur bersih (*Clean Code & Modular*), transisi instan tanpa jeda (*Zero-Flash*), kustomisasi visual penuh, dan proteksi layar OLED (*Anti-Burn-In*).
+  <b>Screensaver Jam Dual-Mode (Analog & Digital) Modern, Elegan, dan Berperforma Tinggi untuk Windows.</b><br>
+  Dirancang dengan arsitektur modular C# native, animasi lipat kartu 3D ala <i>Fliqlo</i>, gerakan jarum mekanik 60 FPS, kustomisasi palet warna penuh, dan proteksi anti-burn-in untuk layar OLED.
 </p>
 
 [✨ Fitur Utama](#-fitur-utama) •
 [🛠️ Teknologi](#️-teknologi-yang-digunakan) •
 [📋 Prasyarat](#-prasyarat-sistem) •
-[📁 Struktur Proyek](#-susunan-struktur-proyek) •
-[🚀 Cara Pasang & Pakai](#-cara-pemasangan--penggunaan) •
-[🧠 Logika & Arsitektur](#-arsitektur-dan-logika-sistem) •
-[🌐 Repositori GitHub](https://github.com/SulthanRaghib/chroniq-screensaver)
+[📁 Struktur Proyek](#-struktur-proyek-modular) •
+[🚀 Cara Pemasangan](#-cara-pemasangan--penggunaan) •
+[📐 Logika Arsitektur](#-arsitektur--logika-matematika) •
+[⚖️ Hak Cipta & Privasi](#️-hak-cipta--kebijakan-privasi)
 
 ---
 
@@ -31,188 +30,222 @@
 
 ## 📖 Tentang Chroniq
 
-**Chroniq** adalah aplikasi screensaver desktop Windows modern yang menggabungkan keindahan estetika minimalis (terinspirasi dari konsep jam flip *Fliqlo* dan jam mekanik *Swiss luxury watches*) dengan performa komputasi grafis vektor native berkecepatan tinggi.
+**Chroniq** adalah aplikasi screensaver desktop Windows modern yang menggabungkan keindahan estetika minimalis (terinspirasi dari jam mekanik mewah Swiss dan jam flip retro modern) dengan komputasi grafis vektor native berkecepatan tinggi.
 
-Chroniq dibangun dengan pendekatan **Dual-Engine Architecture**:
-1. **Native Engine (`C# / GDI+ / Win32`)**: Menghasilkan file screensaver `.scr` berukuran sangat ringan dengan waktu buka instan **0.005 detik (0ms startup)** tanpa jeda dekompresi `%TEMP%` dan tanpa kilatan layar abu-abu.
-2. **Python Prototype Engine (`Pygame-ce / Tkinter`)**: Modul kode sumber Python modular untuk keperluan riset logika trigonometri dan eksperimen pengembangan lintas platform.
+Aplikasi ini dikompilasi secara langsung menggunakan compiler native Microsoft C# (`csc.exe`) menjadi biner mandiri yang sangat ringan tanpa memerlukan dependensi pihak ketiga yang berat.
+
+### 🌟 Keunggulan Utama
+- ⚡ **Startup Instan 0ms (*Zero-Flash*)**: Menghilangkan jeda dekompresi dan kilatan layar abu-abu bawaan Windows saat screensaver aktif.
+- 🕰️ **Dual Engine Mode**: Beralih bebas antara **Jam Analog Mekanik** dan **Jam Digital 3D Split-Flap Card**.
+- 🧈 **Smooth Sweep 60 FPS**: Pergerakan jarum detik mengalir mulus tanpa patah-patah layaknya jam tangan *automatic movement*.
+- 🛡️ **Proteksi Layar OLED (*Sub-Pixel Anti-Burn-In*)**: Pergeseran mikro orbital orbital halus yang melindungi layar OLED/AMOLED dari retensi gambar permanen.
+- 📦 **1-Click Standalone Installer GUI**: Pemasangan, konfigurasi, test preview, dan pencopotan instalasi hanya dengan satu klik mudah.
 
 ---
 
 ## ✨ Fitur Utama
 
-### 1. 🔀 Dual-Mode: Jam Analog 🕰️ & Jam Digital 🔢
-Chroniq memberikan kebebasan bagi Anda untuk memilih mode tampilan sesuai gaya desktop Anda:
-- **Mode Jam Analog 🕰️**:
-  - **Modern**: Tipografi bersih kontemporer dengan angka Arab `1`–`12` dan jarum tapered elegan.
-  - **Classic / Vintage**: Angka Romawi (*I* – *XII*), rel menit *railroad track*, dan jarum klasik *spade/Breguet*.
-  - **Bauhaus / Swiss Railway**: Desain legendaris jam stasiun Swiss dengan penanda balok tebal dan jarum detik piringan merah khas.
-  - **Sport / Diver**: Penanda tebal kontras tinggi dengan jarum panah sporty.
-  - **Minimalist**: Tampilan bersih tanpa angka (hanya garis/titik penanda halus melayang).
-- **Mode Jam Digital 🔢**:
-  - **Flip-Clock Card (ala Fliqlo)**: Kartu jam & menit dengan garis lipatan tengah (*crease*) dan engsel samping khas jam flip retro modern.
-  - **Minimalist Digital**: Tipografi angka digital besar bersih tanpa kotak kartu.
-  - **Opsi Format**: Pilihan format **24 Jam** (`23:50`) atau **12 Jam AM/PM** (`11:50 PM`).
-  - **Toggle Detik Digital**: Menampilkan atau menyembunyikan kartu detik digital.
+### 1. 🔀 Dual-Mode Tampilan
 
-### 2. ⏱️ Kontrol Jarum & Gerakan (Hands & Motion)
-- **Independen Toggle**: Bebas menyalakan atau mematikan **Jarum Jam**, **Jarum Menit**, maupun **Jarum Detik**.
-- **Smooth Continuous Sweep (60 FPS)**: Jarum detik mengalir mulus tanpa patah-patah layaknya jam tangan mekanik otomatis mewah (*luxury automatic watch*).
-- **Classic Tick**: Opsi gerakan melompat 1 kali per detik seperti jam dinding quartz tradisional.
+#### 🕰️ Mode Jam Analog
+- **Modern**: Tipografi bersih kontemporer dengan angka Arab `1`–`12` dan jarum tapered ramping.
+- **Classic / Vintage**: Angka Romawi (*I* – *XII*), rel menit *railroad track*, dan penempatan lencana tanggal yang proporsional.
+- **Bauhaus / Swiss Railway**: Terinspirasi dari jam stasiun Swiss legendaris dengan penanda balok tegas dan jarum detik piringan merah khas.
+- **Sport / Diver**: Penanda tebal kontras tinggi dengan jarum panah sporty berkarakter.
+- **Minimalist**: Tampilan bersih bebas distraksi tanpa angka (hanya titik/garis penanda melayang).
 
-### 3. 🎨 Kustomisasi Warna Penuh & 8 Preset Siap Pakai
-- **Interactive Color Picker**: Kustomisasi warna visual untuk semua elemen:
-  - Latar belakang layar (*Background*)
-  - Piringan jam / Kartu digital (*Dial / Card Face*)
-  - Garis batas lingkaran / kartu (*Border*)
-  - Garis penanda jam & menit (*Markers*)
-  - Teks angka / Angka digital (*Numerals*)
-  - Jarum jam, menit, dan detik
-  - Titik poros tengah / aksen divider (*Accent*)
-  - Kotak latar & teks tanggal
-- **8 Preset Tema Bawaan**:
-  1. 🌑 *Modern Dark* (Gelap elegan kontemporer)
-  2. 🔲 *Fliqlo Monochrome* (Nuansa flip-clock hitam-putih-amber)
-  3. 🏛️ *Classic Vintage Roman* (Krim, emas antik, dan angka Romawi)
-  4. 🇨🇭 *Swiss Railway (Bauhaus)* (Putih bersih dengan detik merah)
-  5. 🌌 *Midnight Sapphire* (Biru safir gelap dengan aksen cyan)
-  6. ⚡ *Cyberpunk Neon* (Nuansa sci-fi neon magenta & cyan)
-  7. 🪨 *Minimal Slate* (Abu-abu slate minimalis monokrom)
-  8. 🌲 *Emerald Luxury* (Hijau zamrud tua dan aksen emas)
+#### 🔢 Mode Jam Digital (Flip & Minimal)
+- **3D Split-Flap Card (ala Fliqlo)**: Animasi kartu atas dan bawah yang terlipat 3D secara mekanis dengan trigonometri kosinus, bayangan kedalaman (*depth shading*), garis lipatan (*crease*), dan engsel samping (*hinges*).
+- **Minimalist Digital**: Tipografi angka digital besar modern tanpa bingkai kartu.
+- **Format 12-Jam & 24-Jam**: Mendukung format 24-jam (`23:50`) maupun 12-jam dengan tag AM/PM berlatar transparan yang terisolasi aman dari angka jam.
+- **Detik Digital**: Kartu detik tambahan opsional yang dapat diaktifkan atau disembunyikan.
 
-### 4. 🌐 Kustomisasi Format & Bahasa Tanggal (Language Support)
-- **Default Sistem (Otomatis)**: Mengikuti bahasa dan format tanggal bawaan Windows OS Anda.
-- **Bahasa Indonesia (RAB 19 AGU)**: Singkatan hari dan bulan bahasa Indonesia.
-- **English (WED 19 AUG)**: Singkatan hari dan bulan bahasa Inggris.
-- **Indonesia Lengkap (Rabu, 19 Agustus)**: Nama hari dan bulan lengkap.
-- **English Full (Wednesday, 19 August)**: Nama lengkap format internasional.
-- **Format Angka (19/08/2026)**: Format angka numerik ringkas.
+---
 
-### 5. 🛡️ Proteksi Layar OLED (Anti-Burn-In Protection)
-- Jam bergeser secara mikro (*sinusoidal orbital drift*) secara periodik setiap beberapa menit untuk melindungi monitor OLED / AMOLED dari *image retention* atau *burn-in*.
+### 2. ⏱️ Kontrol Jarum & Animasi (Motion Control)
+- **Toggle Independen**: Bebas menyalakan atau mematikan Jarum Jam (*Hour*), Jarum Menit (*Minute*), maupun Jarum Detik (*Second*).
+- **60 FPS Smooth Sweep**: Jarum detik meluncur mulus tanpa efek patah-patah (*micro-stuttering*).
+- **Classic Quartz Step**: Pilihan gerakan melompat 1 kali per detik seperti jam dinding quartz tradisional.
 
-### 6. 👁️ Live Test Preview Tanpa Menyimpan Paksa
-- Dilengkapi tombol **"👁️ Test Preview"** di jendela pengaturan untuk menguji coba konfigurasi secara fullscreen. Menggerakkan mouse akan menutup preview dan kembali ke jendela setting tanpa menyimpan paksa ke disk.
+---
+
+### 3. 🎨 Palet Warna Penuh & 8 Preset Siap Pakai
+Pengguna dapat mengkustomisasi setiap elemen visual secara independen:
+- Latar belakang layar (*Background*)
+- Piringan jam / Kartu digital (*Dial / Card Face*)
+- Garis batas lingkaran / kartu (*Border*)
+- Garis penanda jam & menit (*Markers*)
+- Teks angka / Digit digital (*Numerals*)
+- Jarum jam, menit, dan jarum detik
+- Titik poros tengah / Garis lipatan (*Accent & Divider*)
+- Kotak latar & teks lencana tanggal
+
+#### 8 Preset Bawaan:
+1. 🌑 **Modern Dark** — Gelap elegan kontemporer.
+2. 🔲 **Fliqlo Monochrome** — Nuansa klasik flip clock hitam-putih.
+3. 🏛️ **Classic Vintage Roman** — Krim lembut, angka Romawi, dan aksen emas klasik.
+4. 🇨🇭 **Swiss Railway (Bauhaus)** — Putih bersih dengan jarum detik merah khas.
+5. 🌌 **Midnight Sapphire** — Biru safir malam dengan aksen cyan futuristik.
+6. ⚡ **Cyberpunk Neon** — Kontras gelap dengan aksen neon magenta & cyan.
+7. 🪨 **Minimal Slate** — Abu-abu slate monokromatik modern.
+8. 🌲 **Emerald Luxury** — Hijau zamrud tua dengan detail emas mewah.
+
+---
+
+### 4. 🌐 Format & Bahasa Tanggal
+- **Default Sistem**: Mengikuti format dan bahasa Windows secara otomatis.
+- **Bahasa Indonesia Ringkas**: Contoh: `RAB 20 AGU`
+- **English Short**: Contoh: `WED 20 AUG`
+- **Indonesia Lengkap**: Contoh: `Rabu, 20 Agustus`
+- **English Full**: Contoh: `Wednesday, 20 August`
+- **Format Numerik**: Contoh: `20/08/2026`
 
 ---
 
 ## 🛠️ Teknologi yang Digunakan
 
-| Komponen | Teknologi | Keterangan |
-|---|---|---|
-| **Core Screensaver** | **C# / .NET Framework 4.5+** | Dikompilasi dengan Microsoft `csc.exe` menjadi biner mandiri super cepat. |
-| **Graphics Engine** | **Windows GDI+ & Double-Buffering** | Rendering vektor 2D berkecepatan 60 FPS dengan *Anti-Aliasing* halus. |
-| **OS Integration** | **Win32 API (User32 / Shell32)** | Menangani flag Windows screensaver (`/s`, `/c`, `/p`), DPI awareness, & multi-monitor. |
-| **Python Prototype** | **Python 3.10+ & Pygame-ce** | Engine referensi modular untuk pengujian logika trigonometri dan rotasi. |
-| **Config Engine** | **JSON Architecture** | Konfigurasi tersimpan otomatis di `%APPDATA%\ChroniqScreensaver\chroniq_config.json`. |
+| Modul / Komponen | Teknologi | Deskripsi |
+| :--- | :--- | :--- |
+| **Core Architecture** | **C# / .NET Framework 4.5+** | Kode terstruktur berbasis OOP bersih, ringan, dan cepat. |
+| **Vector Rendering** | **Windows GDI+ (System.Drawing)** | Anti-Aliasing, HighQualityBicubic, dan ClearTypeGridFit. |
+| **Animation Loop** | **High-Precision Timer & Stopwatch** | Rendering terkunci pada true 60 FPS tanpa lonjakan beban CPU. |
+| **OS Integration** | **Win32 API (User32 / Shell32)** | Menangani argumen native Windows screensaver (`/s`, `/c`, `/p`), multi-monitor, dan DPI scaling. |
+| **Installer Engine** | **WinForms 1-Click GUI Installer** | Pengaturan registry otomatis `Control Panel\Desktop` dan penyalinan file ke `%LocalAppData%`. |
+| **Web Simulator** | **HTML5 Canvas & Tailwind CSS** | Simulator interaktif online untuk mencoba seluruh preset di browser. |
 
 ---
 
 ## 📋 Prasyarat Sistem
 
 ### Untuk Menjalankan Screensaver:
-- **Sistem Operasi**: Windows 10 atau Windows 11 (64-bit / 32-bit).
-- **.NET Framework**: Versi 4.5 atau lebih baru (*Sudah terpasang secara bawaan di Windows 10 dan 11*).
-- **Tanpa instalasi runtime tambahan** untuk file hasil kompilasi `dist/Chroniq.scr`.
+- **Sistem Operasi**: Windows 10 atau Windows 11 (64-bit & 32-bit).
+- **.NET Framework**: Versi 4.5 ke atas (*Telah terpasang secara bawaan di Windows 10 & 11*).
+- **Kebutuhan RAM / CPU**: $< 25\text{ MB}$ RAM, $< 0.5\%$ penggunaan CPU.
 
-### Untuk Pengembangan / Kompilasi Kode Sumber (Opsional):
-- **Compiler C#**: Microsoft `csc.exe` (*Sudah tersedia bawaan di folder `C:\Windows\Microsoft.NET\Framework64\`*).
-- **Python (Opsional)**: Python 3.10+ dengan library `pygame-ce` jika ingin menjalankan versi Python (`pip install pygame-ce`).
+### Untuk Mengkompilasi Kode Sumber (Opsional bagi Pengembang):
+- **C# Compiler**: Microsoft `csc.exe` (*Tersedia bawaan di `C:\Windows\Microsoft.NET\Framework64\v4.0.30319\`*).
+- **Python**: Python 3.10+ untuk menjalankan skrip build otomatis `scripts/build_screensaver.py`.
 
 ---
 
-## 📁 Susunan Struktur Proyek
+## 📁 Struktur Proyek Modular
 
 ```
 chroniq-screensaver/
 │
-├── 📂 assets/                            # Aset Visual & Ikon Aplikasi
-│   ├── chroniq_icon.png                 # Logo Resmi Chroniq (High-Res)
-│   ├── chroniq_banner.jpg               # Banner Display
-│   └── favicon.ico                      # Multi-size Windows Icon
+├── 📂 assets/                                # Aset Grafis & Ikon High-Resolution
+│   ├── chroniq_icon.png                     # Logo Resmi Chroniq (1024x1024)
+│   └── favicon.ico                          # Multi-size Windows Icon
 │
-├── 📂 src/                               # Seluruh Kode Sumber Utama
-│   ├── 📂 native/                        # Native Windows Engine (C# / GDI+ / Win32)
-│   │   └── NativeScreensaver.cs         # Engine Screensaver & Native Settings GUI
-│   └── 📂 python/                        # Engine Python (Pygame / Cross-Platform Prototype)
-│       ├── __init__.py
-│       ├── main.py                      # Entry point Python
-│       ├── clock_renderer.py            # Pygame 2D vector renderer
-│       ├── config_manager.py            # JSON config & theme presets
-│       └── settings_gui.py              # Tkinter GUI configurator
+├── 📂 src/
+│   └── 📂 native/                            # Native Windows Engine (C#)
+│       ├── 📂 Core/
+│       │   ├── Program.cs                   # Entry Point & Parsing Argumen Windows (/s, /c, /p)
+│       │   └── ColorHelper.cs               # Utilitas Warna, Hex Parsing, & Rounded Path
+│       ├── 📂 Models/
+│       │   └── ClockConfig.cs               # Manajemen Konfigurasi JSON & 8 Tema Preset
+│       ├── 📂 Rendering/
+│       │   ├── AnalogClockRenderer.cs       # Vector Engine Jam Analog 60 FPS
+│       │   └── DigitalClockRenderer.cs      # 3D Split-Flap Card Engine ala Fliqlo
+│       ├── 📂 UI/
+│       │   ├── ScreenSaverForm.cs           # Jendela Fullscreen & Multi-Monitor Handler
+│       │   └── SettingsForm.cs              # Antarmuka Pengaturan Jam & Live Test Preview
+│       ├── 📂 Installer/
+│       │   └── SetupForm.cs                 # GUI Installer Mandiri 1-Klik (Chroniq_Setup.exe)
+│       └── 📂 Native/
+│           └── Win32Interop.cs              # Deklarasi P/Invoke Win32 API
 │
-├── 📂 scripts/                           # Skrip Build & Automasi
-│   ├── build_screensaver.py             # Pipeline kompilasi otomatis
-│   ├── build.bat                       # Build 1-klik ke .scr
-│   ├── install_screensaver.bat          # Installer 1-klik ke Windows
-│   ├── open_settings.bat               # Membuka jendela pengaturan
-│   ├── run_screensaver.bat              # Menjalankan screensaver fullscreen
-│   └── test_windowed.bat               # Menjalankan mode jendela testing
+├── 📂 website/                               # Website Resmi & Web Simulator
+│   ├── index.html                           # Landing Page Resmi & Dokumen Hukum
+│   ├── js/
+│   │   ├── clock_simulator.js               # Canvas 2D / 3D Flip Engine Web
+│   │   └── main.js                          # Kontrol Interaktif UI Web
+│   └── dist/                                # Biner Siap Unduh untuk Pengunjung
 │
-├── 📂 tests/                             # Suite Pengujian Otomatis
-│   └── test_suite.py                    # Automated test suite (Python engine)
+├── 📂 scripts/                               # Skrip Build & Otomasi
+│   ├── build_screensaver.py                 # Pipeline Kompilasi Otomatis C# & Packaging
+│   ├── install_screensaver.bat              # Skrip Batch Pasang Cepat
+│   ├── uninstall_screensaver.bat            # Skrip Batch Copot Bersih
+│   └── open_settings.bat                   # Skrip Membuka Jendela Konfigurasi
 │
-├── 📂 dist/                              # File Hasil Jadi Siap Pasang
-│   ├── Chroniq.scr                      # Windows Screensaver Resmi Berikon (148 KB)
-│   └── Chroniq.exe                      # Standalone Executable
+├── 📂 dist/                                  # Output Kompilasi Siap Pakai
+│   ├── Chroniq_Setup.exe                    # 1-Click GUI Installer Mandiri
+│   ├── Chroniq.scr                          # Screensaver Windows Resmi
+│   ├── Chroniq.exe                          # Standalone Executable
+│   └── Chroniq_Windows.zip                  # Paket Distribusi Lengkap
 │
-├── .gitignore                           # Aturan ignore Git
-└── README.md                            # Dokumentasi resmi proyek
+├── .gitignore                               # Aturan Eksklusi Git
+└── README.md                                # Dokumentasi Resmi Proyek
 ```
 
 ---
 
 ## 🚀 Cara Pemasangan & Penggunaan
 
-### 1. Pemasangan ke Windows (Metode Cepat):
-1. Buka folder **[`dist/`](file:///d:/Kerja/jam-analog-screensaver/dist/)**.
-2. **Klik kanan** pada file **`Chroniq.scr`** -> Pilih **Install** (atau jalankan [`scripts/install_screensaver.bat`](file:///d:/Kerja/jam-analog-screensaver/scripts/install_screensaver.bat)).
-3. Jendela **Screen Saver Settings** bawaan Windows akan otomatis terbuka dengan **Chroniq** terpilih.
-4. Tentukan waktu tunggu (*Wait time*) dan klik **OK**.
+### Metode 1: Menggunakan 1-Click Installer (Paling Mudah) ⭐
+1. Unduh atau buka file **`dist/Chroniq_Setup.exe`**.
+2. Klik tombol **"💾 Pasang ke Windows"**.
+3. Chroniq akan otomatis terdaftar sebagai screensaver aktif di sistem Windows Anda!
 
-### 2. Mengubah Warna & Gaya Jam:
-1. Di jendela **Screen Saver Settings** Windows, klik tombol **Settings...** (atau jalankan [`scripts/open_settings.bat`](file:///d:/Kerja/jam-analog-screensaver/scripts/open_settings.bat)).
-2. Pilih mode **Jam Analog 🕰️** atau **Jam Digital 🔢**.
-3. Pilih tema preset yang tersedia atau klik kotak warna untuk memilih warna kustom Anda sendiri.
-4. Klik tombol **👁️ Test Preview** untuk melihat hasil jam secara langsung di layar monitor Anda.
-5. Klik **Simpan & Terapkan** untuk menyimpan konfigurasi secara permanen.
+### Metode 2: Pemasangan Manual File `.SCR`
+1. Buka folder **`dist/`**.
+2. Klik kanan pada file **`Chroniq.scr`** -> Pilih **Properties** -> Centang kotak **"Unblock"** (jika ada) -> Klik **OK**.
+3. Klik kanan kembali pada **`Chroniq.scr`** -> Pilih **Install**.
+4. Jendela *Screen Saver Settings* Windows akan terbuka dengan Chroniq terpilih.
+
+### ⚙️ Mengatur Warna, Mode, dan Ukuran Jam:
+1. Jalankan **`Chroniq_Setup.exe`** lalu klik tombol **"⚙️ Pengaturan"**, atau buka via *Screen Saver Settings -> Settings...*.
+2. Pilih antara **Jam Analog** atau **Jam Digital**.
+3. Pilih tema warna favorit Anda atau pilih warna kustom.
+4. Klik tombol **"👁️ Test Preview"** untuk melihat hasil jam secara langsung di layar monitor.
+5. Klik **"💾 Simpan & Terapkan"**.
 
 ---
 
-## 🧠 Arsitektur dan Logika Sistem
+## 📐 Arsitektur & Logika Matematika
 
-### 📐 1. Perhitungan Sudut Trigonometri Jarum (Mode Analog)
-Posisi jarum jam dihitung berdasarkan koordinat polar lingkaran yang dikonversi ke koordinat kartesius $ (x, y) $:
+### 1. Perhitungan Trigonometri Jarum Analog (60 FPS Continuous Sweep)
+Posisi jarum jam dihitung berdasarkan koordinat polar sudut trigonometri yang diproyeksikan ke bidang Kartesius $(x, y)$:
 
 $$\theta_{\text{detik}} = \left(\text{detik} + \frac{\text{milidetik}}{1000}\right) \times 6^\circ - 90^\circ$$
 
 $$\theta_{\text{menit}} = \left(\text{menit} + \frac{\theta_{\text{detik}} + 90^\circ}{360}\right) \times 6^\circ - 90^\circ$$
 
-$$\theta_{\text{jam}} = \left((\text{jam} \pmod{12}) + \frac{\text{menit}}{60}\right) \times 30^\circ - 90^\circ$$
+$$\theta_{\text{jam}} = \left((\text{jam} \bmod 12) + \frac{\text{menit}}{60}\right) \times 30^\circ - 90^\circ$$
 
-$$x = x_{\text{pusat}} + r \cdot \cos(\theta), \quad y = y_{\text{pusat}} + r \cdot \sin(\theta)$$
+$$x = x_{\text{center}} + r \cdot \cos(\theta), \quad y = y_{\text{center}} + r \cdot \sin(\theta)$$
 
-### ⚡ 2. Zero-Flash Window Initialization
-Untuk mencegah kilatan abu-abu bawaan Windows saat jendela baru dibuat, aplikasi menginisialisasi buffer grafis sebelum jendela ditampilkan:
-1. Jendela dibuat dengan style `WS_CHILD | WS_VISIBLE` atau `NOFRAME` dengan status tersembunyi.
-2. Buffer grafis ganda (*Double Buffer*) langsung diisi penuh dengan warna tema dan render jam frame pertama.
-3. Fungsi `ShowWindow` dan `SetForegroundWindow` dipanggil secara sinkron, sehingga saat layar monitor menyala, tampilan jam sudah 100% siap.
+### 2. Animasi Lipatan 3D Kartu Flip Digital (Split-Flap Trigonometry)
+Rotasi kartu flip digital menggunakan transformasi penskalaan vertikal non-linear 2-fase berbasis fungsi kosinus:
+
+- **Fase 1 (Kartu Atas Menutup ke Bawah, $0 \le p < 0.5$):**
+  $$\text{scaleY} = \cos(p \cdot \pi), \quad \text{Shadow Alpha} = p \times 1.2$$
+- **Fase 2 (Kartu Bawah Terbuka Jatuh, $0.5 \le p \le 1.0$):**
+  $$\text{scaleY} = -\cos(p \cdot \pi), \quad \text{Shadow Alpha} = (1 - p) \times 1.2$$
 
 ---
 
-## 🧪 Pengujian Otomatis (*Testing*)
+## ⚖️ Hak Cipta & Kebijakan Privasi
 
-Untuk memastikan seluruh kombinasi gaya dan perhitungan sudut jarum bebas dari galat (*error-free*), jalankan suite pengujian:
+### 🛡️ Kebijakan Privasi (Privacy Policy)
+- **100% Offline**: Chroniq beroperasi sepenuhnya secara offline di komputer lokal Anda.
+- **Zero Data Collection**: Tidak mengumpulkan, mencatat, mentransmisikan, atau menjual data pribadi, ketukan keyboard, atau aktivitas pengguna.
+- **Konfigurasi Lokal**: Preferensi hanya disimpan di `%LocalAppData%\Chroniq\settings.json`.
+- **Bebas Telemetri**: Tidak mengandung SDK analitik, iklan, spyware, atau telemetri latar belakang.
 
-```bash
-python tests/test_suite.py
+### 📜 Hak Cipta (Copyright Notice)
+Seluruh hak cipta, merek dagang, desain visual jam, tata letak antarmuka, dan kode sumber proyek ini dimiliki secara sah dan eksklusif oleh:
+
+```text
+Copyright © 2026 Chroniq. Engineered & Crafted by Sulthan Raghib Fillah.
+All Rights Reserved.
 ```
 
 ---
 
 <div align="center">
 
-**Chroniq Screensaver — Dibuat untuk estetika desktop Windows yang bersih, modern, dan elegan.**  
-*Crafted with precision & passion.*
+Dibuat dengan dedikasi tinggi untuk keindahan & estetika desktop Windows.  
+Hubungi kreator: [**Sulthan Raghib Fillah di LinkedIn**](https://www.linkedin.com/in/sulthan-raghib-fillah/)
 
 </div>
