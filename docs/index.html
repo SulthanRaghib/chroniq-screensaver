@@ -540,12 +540,12 @@
       <div class="flex flex-wrap items-center justify-center gap-6 text-xs text-gray-400 font-medium">
         <button type="button" onclick="openLegalModal('privacy')" class="hover:text-cyan-300 transition-colors cursor-pointer flex items-center gap-1.5 py-1">
           <i data-lucide="shield-check" class="w-4 h-4 text-cyan-400"></i>
-          <span>Kebijakan Privasi (Privacy Policy)</span>
+          <span>Privacy Policy</span>
         </button>
         <span class="text-white/20 hidden sm:inline">•</span>
         <button type="button" onclick="openLegalModal('terms')" class="hover:text-cyan-300 transition-colors cursor-pointer flex items-center gap-1.5 py-1">
           <i data-lucide="scale" class="w-4 h-4 text-cyan-400"></i>
-          <span>Syarat & Hak Cipta (Terms & Copyright)</span>
+          <span>Terms of Service & Copyright</span>
         </button>
       </div>
 
@@ -577,7 +577,7 @@
       <div class="flex items-center justify-between px-6 py-5 border-b border-white/10 bg-white/[0.02]">
         <div class="flex items-center gap-3">
           <img src="assets/chroniq_icon.png" alt="Chroniq" class="w-7 h-7 rounded-lg" />
-          <h3 class="text-base sm:text-lg font-bold text-white tracking-tight">Dokumen Hukum & Privasi Chroniq</h3>
+          <h3 class="text-base sm:text-lg font-bold text-white tracking-tight">Chroniq Legal & Privacy Documentation</h3>
         </div>
         <button type="button" onclick="closeLegalModal()" class="p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer">
           <i data-lucide="x" class="w-5 h-5"></i>
@@ -588,11 +588,11 @@
       <div class="flex border-b border-white/10 bg-white/[0.01] px-6">
         <button id="tab-btn-privacy" onclick="switchLegalTab('privacy')" class="py-3 px-4 font-semibold text-sm border-b-2 border-cyan-400 text-cyan-400 transition-colors flex items-center gap-2 cursor-pointer">
           <i data-lucide="shield-check" class="w-4 h-4"></i>
-          <span>Kebijakan Privasi</span>
+          <span>Privacy Policy</span>
         </button>
         <button id="tab-btn-terms" onclick="switchLegalTab('terms')" class="py-3 px-4 font-semibold text-sm border-b-2 border-transparent text-gray-400 hover:text-gray-200 transition-colors flex items-center gap-2 cursor-pointer">
           <i data-lucide="scale" class="w-4 h-4"></i>
-          <span>Syarat Layanan & Hak Cipta</span>
+          <span>Terms of Service & Copyright</span>
         </button>
       </div>
 
@@ -604,28 +604,28 @@
           <div class="p-4 rounded-2xl bg-cyan-950/30 border border-cyan-500/20 text-cyan-200 text-xs flex items-start gap-3">
             <i data-lucide="lock" class="w-5 h-5 text-cyan-400 shrink-0 mt-0.5"></i>
             <div>
-              <b>Ringkasan Privasi:</b> Chroniq beroperasi <b>100% secara offline</b> di komputer Anda. Kami sama sekali tidak mengumpulkan, menyimpan, mentransmisikan, atau menjual data pribadi Anda.
+              <b>Privacy Guarantee:</b> Chroniq operates <b>100% offline</b> on your computer. We do not collect, store, transmit, track, or sell any personal data whatsoever.
             </div>
           </div>
 
-          <h4 class="text-base font-bold text-white">1. Tidak Ada Pengumpulan Data Pribadi (Zero Data Collection)</h4>
-          <p class="text-gray-400 text-xs">
-            Aplikasi screensaver Chroniq dan website resminya tidak meminta, mencatat, atau mengumpulkan informasi identitas pribadi (seperti nama, email, lokasi, atau penekanan tombol keyboard). Seluruh rendering jam analog dan digital diproses langsung oleh kartu grafis/CPU perangkat lokal Anda.
+          <h4 class="text-base font-bold text-white">1. Zero Data Collection</h4>
+          <p class="text-gray-400 text-xs leading-relaxed">
+            The Chroniq screensaver application and its official website do not collect, log, track, or transmit any personally identifiable information (PII), device identifiers, IP addresses, keystrokes, or usage habits. All clock graphics and animations are rendered locally on your device's hardware.
           </p>
 
-          <h4 class="text-base font-bold text-white">2. Penyimpanan Konfigurasi Lokal (Local Storage)</h4>
-          <p class="text-gray-400 text-xs">
-            Pengaturan preferensi yang Anda pilih (seperti tema warna, format 24 jam, dan gaya jarum) disimpan secara eksklusif dalam file konfigurasi lokal di folder direktori sistem Anda (<code class="text-cyan-300 bg-white/5 px-1.5 py-0.5 rounded">%LocalAppData%\Chroniq\settings.json</code> atau Registry lokal Windows). Data konfigurasi ini tidak pernah dikirim ke jaringan internet atau server mana pun.
+          <h4 class="text-base font-bold text-white">2. Local-Only Configuration Storage</h4>
+          <p class="text-gray-400 text-xs leading-relaxed">
+            Your user preferences (such as selected color presets, digital 24-hour mode, date language, and hand designs) are stored exclusively in a local configuration file on your system directory (<code class="text-cyan-300 bg-white/5 px-1.5 py-0.5 rounded">%LocalAppData%\Chroniq\settings.json</code> or local Windows registry). This configuration data never leaves your computer and is never transmitted over any network.
           </p>
 
-          <h4 class="text-base font-bold text-white">3. Tanpa Iklan, Telemetri, atau Pelacak Pihak Ketiga</h4>
-          <p class="text-gray-400 text-xs">
-            Chroniq bebas 100% dari SDK analitik pelacak, telemetri latar belakang, spyware, adware, maupun cookies pelacak iklan komersial.
+          <h4 class="text-base font-bold text-white">3. Zero Ads, Telemetry, or Third-Party SDKs</h4>
+          <p class="text-gray-400 text-xs leading-relaxed">
+            Chroniq contains absolutely no background telemetry services, tracking analytics, spyware, adware, or advertising cookies.
           </p>
 
-          <h4 class="text-base font-bold text-white">4. Kepatuhan Regulasi Perlindungan Data</h4>
-          <p class="text-gray-400 text-xs">
-            Kebijakan privasi ini disusun sesuai dengan prinsip privasi internasional termasuk <i>General Data Protection Regulation (GDPR)</i>, <i>California Consumer Privacy Act (CCPA)</i>, dan Undang-Undang Perlindungan Data Pribadi (UU PDP No. 27/2022).
+          <h4 class="text-base font-bold text-white">4. Regulatory Compliance</h4>
+          <p class="text-gray-400 text-xs leading-relaxed">
+            This Privacy Policy adheres strictly to international data privacy principles, including the <i>General Data Protection Regulation (GDPR)</i>, the <i>California Consumer Privacy Act (CCPA)</i>, and global privacy standards.
           </p>
         </div>
 
@@ -634,28 +634,28 @@
           <div class="p-4 rounded-2xl bg-blue-950/30 border border-blue-500/20 text-blue-200 text-xs flex items-start gap-3">
             <i data-lucide="copyright" class="w-5 h-5 text-blue-400 shrink-0 mt-0.5"></i>
             <div>
-              <b>Hak Cipta Terdaftar:</b> Chroniq adalah karya cipta asli yang dirancang dan dikembangkan oleh <b>Sulthan Raghib Fillah</b>.
+              <b>Proprietary Copyright:</b> Chroniq is an original desktop screensaver software engineered and crafted by <b>Sulthan Raghib Fillah</b>.
             </div>
           </div>
 
-          <h4 class="text-base font-bold text-white">1. Hak Kekayaan Intelektual (Intellectual Property)</h4>
-          <p class="text-gray-400 text-xs">
-            Seluruh hak cipta, merek dagang, desain grafis piringan jam, ikon antarmuka, arsitektur kode sumber, dan dokumentasi visual Chroniq adalah milik eksklusif <b>Sulthan Raghib Fillah</b> (© 2026 Sulthan Raghib Fillah. All Rights Reserved).
+          <h4 class="text-base font-bold text-white">1. Intellectual Property & Ownership</h4>
+          <p class="text-gray-400 text-xs leading-relaxed">
+            All rights, title, and interest in and to Chroniq, including its brand name, logos, original dial graphics, software architecture, UI layouts, and documentation, are the exclusive intellectual property of <b>Sulthan Raghib Fillah</b> (© 2026 Sulthan Raghib Fillah. All Rights Reserved).
           </p>
 
-          <h4 class="text-base font-bold text-white">2. Pemberian Izin Penggunaan (License Grant)</h4>
-          <p class="text-gray-400 text-xs">
-            Pengguna diberikan hak bebas royalti, non-eksklusif, dan dapat dibatalkan untuk mengunduh, memasang, dan menikmati Chroniq Screensaver pada perangkat pribadi maupun komputer kerja tanpa biaya apa pun.
+          <h4 class="text-base font-bold text-white">2. License Grant</h4>
+          <p class="text-gray-400 text-xs leading-relaxed">
+            Users are granted a free, non-exclusive, revocable license to download, install, and run Chroniq on their personal or commercial Windows computers for display and personalization purposes.
           </p>
 
-          <h4 class="text-base font-bold text-white">3. Batasan Penggunaan</h4>
-          <p class="text-gray-400 text-xs">
-            Dilarang mendistribusikan ulang, membundel ke dalam paket installer berbayar, mengubah atribusi hak cipta pencipta, atau melakukan tindakan *reverse-engineering* berbahaya untuk tujuan komersialisasi pihak ketiga tanpa persetujuan tertulis dari Author.
+          <h4 class="text-base font-bold text-white">3. Restrictions</h4>
+          <p class="text-gray-400 text-xs leading-relaxed">
+            You may not repackage Chroniq into paid commercial software bundles, claim authorship of the software, modify author attributions, or distribute malicious modifications without explicit prior written authorization from the creator.
           </p>
 
-          <h4 class="text-base font-bold text-white">4. Penafian Tanggung Jawab (Disclaimer of Warranty)</h4>
-          <p class="text-gray-400 text-xs">
-            Software disediakan "SEBAGAIMANA ADANYA" (*AS-IS*) tanpa jaminan apa pun baik tersurat maupun tersirat. Pencipta tidak bertanggung jawab atas segala bentuk kerusakan perangkat keras, kehilangan data, atau gangguan sistem yang timbul dari penggunaan software ini.
+          <h4 class="text-base font-bold text-white">4. Disclaimer of Warranty & Limitation of Liability</h4>
+          <p class="text-gray-400 text-xs leading-relaxed">
+            The software is provided "AS IS", without warranty of any kind, express or implied. In no event shall the author or copyright holder be liable for any claim, damages, hardware failures, or other liabilities arising from the use or inability to use the software.
           </p>
         </div>
 
@@ -663,9 +663,9 @@
 
       <!-- Modal Footer -->
       <div class="px-6 py-4 border-t border-white/10 bg-white/[0.02] flex items-center justify-between">
-        <span class="text-[11px] text-gray-500">Terakhir Diperbarui: 20 Agustus 2026</span>
+        <span class="text-[11px] text-gray-500">Last Updated: August 20, 2026</span>
         <button type="button" onclick="closeLegalModal()" class="px-5 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-black font-semibold text-xs transition-all cursor-pointer">
-          Saya Mengerti (Tutup)
+          Understood (Close)
         </button>
       </div>
 
